@@ -1,0 +1,52 @@
+{
+   "streets":[
+      {
+         "name":"Hlavackova",
+		 "coordinates":[
+         {"x":"10", "y":"4"},
+         {"x":"120", "y":"190"},
+         {"x":"600", "y":"620"}
+         ],
+         "stopList":[
+            {
+               "nameStop":"Hlavackova1",
+               "x":"1",
+               "y":"1"
+            },
+            {
+               "nameStop":"Hlavackova2",
+               "x":"5",
+               "y":"7"
+            }
+         ]
+      },
+      {
+         "name":"Semillaso",
+         "coordinates":[
+            {"x":"100", "y":"4"},
+            {"x":"600", "y":"200"},
+            {"x":"1000", "y":"100"},
+            {"x":"1100", "y":"100"}
+         ],
+         "stopList":[
+            {
+               "nameStop":"Semillaso1",
+               "x":"20",
+               "y":"8"
+            }
+         ]
+      }
+   ],
+   "links":[
+      {
+         "linkNumber":"7",
+         "stationsList":[
+            {
+               "stationIdName":"Hlavackova1",
+               "stationIdName":"Hlavackova2",
+               "stationIdName":"Semilasso"
+            }
+         ]
+      }
+   ]
+}
