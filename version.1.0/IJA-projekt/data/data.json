@@ -1,11 +1,10 @@
 {
    "streets":[
       {
-         "name":"Hlavackova",
+         "name":"Adamiho",
 		 "coordinates":[
-         {"x":"10", "y":"4"},
-         {"x":"120", "y":"190"},
-         {"x":"600", "y":"620"}
+         {"x":"60", "y":"60"},
+         {"x":"200", "y":"200"}
          ],
          "stopList":[
             {
@@ -21,12 +20,385 @@
          ]
       },
       {
-         "name":"Semillaso",
+         "name":"Brezova",
          "coordinates":[
-            {"x":"100", "y":"4"},
-            {"x":"600", "y":"200"},
-            {"x":"1000", "y":"100"},
-            {"x":"1100", "y":"100"}
+            {"x":"200", "y":"200"},
+            {"x":"520", "y":"250"}
+         ],
+         "stopList":[
+            {
+               "nameStop":"Semillaso1",
+               "x":"20",
+               "y":"8"
+            }
+         ]
+      },
+      {
+         "name":"Cyprichova",
+         "coordinates":[
+            {"x":"200", "y":"200"},
+            {"x":"120", "y":"600"}
+         ],
+         "stopList":[
+            {
+               "nameStop":"Hlavackova1",
+               "x":"1",
+               "y":"1"
+            },
+            {
+               "nameStop":"Hlavackova2",
+               "x":"5",
+               "y":"7"
+            }
+         ]
+      },
+      {
+         "name":"Dneperska",
+         "coordinates":[
+            {"x":"120", "y":"600"},
+            {"x":"300", "y":"750"}
+         ],
+         "stopList":[
+            {
+               "nameStop":"Semillaso1",
+               "x":"20",
+               "y":"8"
+            }
+         ]
+      },
+      {
+         "name":"Einsteinova",
+         "coordinates":[
+            {"x":"520", "y":"250"},
+            {"x":"560", "y":"700"}
+         ],
+         "stopList":[
+            {
+               "nameStop":"Hlavackova1",
+               "x":"1",
+               "y":"1"
+            },
+            {
+               "nameStop":"Hlavackova2",
+               "x":"5",
+               "y":"7"
+            }
+         ]
+      },
+      {
+         "name":"Farska",
+         "coordinates":[
+            {"x":"120", "y":"600"},
+            {"x":"300", "y":"500"}
+
+         ],
+         "stopList":[
+            {
+               "nameStop":"Semillaso1",
+               "x":"20",
+               "y":"8"
+            }
+         ]
+      },
+      {
+         "name":"Gastanova",
+         "coordinates":[
+            {"x":"300", "y":"500"},
+            {"x":"560", "y":"700"}
+         ],
+         "stopList":[
+            {
+               "nameStop":"Hlavackova1",
+               "x":"1",
+               "y":"1"
+            },
+            {
+               "nameStop":"Hlavackova2",
+               "x":"5",
+               "y":"7"
+            }
+         ]
+      },
+      {
+         "name":"Hanacka",
+         "coordinates":[
+            {"x":"300", "y":"500"},
+            {"x":"320", "y":"395"}
+         ],
+         "stopList":[
+            {
+               "nameStop":"Semillaso1",
+               "x":"20",
+               "y":"8"
+            }
+         ]
+      },
+      {
+         "name":"Ihlicnata",
+         "coordinates":[
+            {"x":"320", "y":"395"},
+            {"x":"520", "y":"250"}
+         ],
+         "stopList":[
+            {
+               "nameStop":"Hlavackova1",
+               "x":"1",
+               "y":"1"
+            },
+            {
+               "nameStop":"Hlavackova2",
+               "x":"5",
+               "y":"7"
+            }
+         ]
+      },
+      {
+         "name":"Jakubska",
+         "coordinates":[
+            {"x":"560", "y":"700"},
+            {"x":"850", "y":"570"}
+         ],
+         "stopList":[
+            {
+               "nameStop":"Semillaso1",
+               "x":"20",
+               "y":"8"
+            }
+         ]
+      },
+      {
+         "name":"Klukata",
+         "coordinates":[
+            {"x":"850", "y":"570"},
+            {"x":"940", "y":"840"}
+         ],
+         "stopList":[
+            {
+               "nameStop":"Hlavackova1",
+               "x":"1",
+               "y":"1"
+            },
+            {
+               "nameStop":"Hlavackova2",
+               "x":"5",
+               "y":"7"
+            }
+         ]
+      },
+      {
+         "name":"Likavska",
+         "coordinates":[
+            {"x":"940", "y":"840"},
+            {"x":"950", "y":"690"}
+         ],
+         "stopList":[
+            {
+               "nameStop":"Semillaso1",
+               "x":"20",
+               "y":"8"
+            }
+         ]
+      },
+      {
+         "name":"Makova",
+         "coordinates":[
+            {"x":"950", "y":"690"},
+            {"x":"920", "y":"520"}
+         ],
+         "stopList":[
+            {
+               "nameStop":"Hlavackova1",
+               "x":"1",
+               "y":"1"
+            },
+            {
+               "nameStop":"Hlavackova2",
+               "x":"5",
+               "y":"7"
+            }
+         ]
+      },
+      {
+         "name":"Narcisova",
+         "coordinates":[
+            {"x":"920", "y":"520"},
+            {"x":"750", "y":"410"}
+         ],
+         "stopList":[
+            {
+               "nameStop":"Semillaso1",
+               "x":"20",
+               "y":"8"
+            }
+         ]
+      },
+      {
+         "name":"Ondrejova",
+         "coordinates":[
+            {"x":"850", "y":"570"},
+            {"x":"750", "y":"410"}
+         ],
+         "stopList":[
+            {
+               "nameStop":"Hlavackova1",
+               "x":"1",
+               "y":"1"
+            },
+            {
+               "nameStop":"Hlavackova2",
+               "x":"5",
+               "y":"7"
+            }
+         ]
+      },
+      {
+         "name":" Parenicova",
+         "coordinates":[
+            {"x":"60", "y":"60"},
+            {"x":"120", "y":"600"}
+         ],
+         "stopList":[
+            {
+               "nameStop":"Semillaso1",
+               "x":"20",
+               "y":"8"
+            }
+         ]
+      },
+      {
+         "name":"Radarova",
+         "coordinates":[
+            {"x":"560", "y":"700"},
+            {"x":"750", "y":"410"}
+         ],
+         "stopList":[
+            {
+               "nameStop":"Hlavackova1",
+               "x":"1",
+               "y":"1"
+            },
+            {
+               "nameStop":"Hlavackova2",
+               "x":"5",
+               "y":"7"
+            }
+         ]
+      },
+      {
+         "name":"Septimova",
+         "coordinates":[
+            {"x":"520", "y":"250"},
+            {"x":"750", "y":"410"}
+         ],
+         "stopList":[
+            {
+               "nameStop":"Semillaso1",
+               "x":"20",
+               "y":"8"
+            }
+         ]
+      },
+      {
+         "name":"Tupeho",
+         "coordinates":[
+            {"x":"750", "y":"410"},
+            {"x":"900", "y":"250"}
+
+         ],
+         "stopList":[
+            {
+               "nameStop":"Hlavackova1",
+               "x":"1",
+               "y":"1"
+            },
+            {
+               "nameStop":"Hlavackova2",
+               "x":"5",
+               "y":"7"
+            }
+         ]
+      },
+      {
+         "name":"Uranova",
+         "coordinates":[
+            {"x":"920", "y":"520"},
+            {"x":"900", "y":"250"}
+         ],
+         "stopList":[
+            {
+               "nameStop":"Semillaso1",
+               "x":"20",
+               "y":"8"
+            }
+         ]
+      },
+      {
+         "name":"Vinna",
+         "coordinates":[
+            {"x":"900", "y":"250"},
+            {"x":"480", "y":"125"}
+
+         ],
+         "stopList":[
+            {
+               "nameStop":"Hlavackova1",
+               "x":"1",
+               "y":"1"
+            },
+            {
+               "nameStop":"Hlavackova2",
+               "x":"5",
+               "y":"7"
+            }
+         ]
+      },
+      {
+         "name":"Wilsonova",
+         "coordinates":[
+            {"x":"480", "y":"125"},
+            {"x":"60", "y":"60"}
+         ],
+         "stopList":[
+            {
+               "nameStop":"Semillaso1",
+               "x":"20",
+               "y":"8"
+            }
+         ]
+      },
+      {
+         "name":"Xylova",
+         "coordinates":[
+            {"x":"300", "y":"750"},
+            {"x":"560", "y":"700"}
+         ],
+         "stopList":[
+            {
+               "nameStop":"Semillaso1",
+               "x":"20",
+               "y":"8"
+            }
+         ]
+      },
+      {
+         "name":"Ypsilonova",
+         "coordinates":[
+            {"x":"560", "y":"700"},
+            {"x":"940", "y":"840"}
+         ],
+         "stopList":[
+            {
+               "nameStop":"Semillaso1",
+               "x":"20",
+               "y":"8"
+            }
+         ]
+      },
+      {
+         "name":"Zapadna",
+         "coordinates":[
+            {"x":"520", "y":"250"},
+            {"x":"480", "y":"125"}
          ],
          "stopList":[
             {
@@ -37,6 +409,12 @@
          ]
       }
    ],
+
+
+
+
+
+
    "links":[
       {
          "linkNumber":"7",
