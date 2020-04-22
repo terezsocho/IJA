@@ -20,6 +20,18 @@ public class Street  implements Draw {
         this.stop = stop;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public Coordinate getStart() {
+        return start;
+    }
+
+    public Coordinate getStop() {
+        return stop;
+    }
+
     @Override
     public List<Shape> getGUI(){
         return Arrays.asList(

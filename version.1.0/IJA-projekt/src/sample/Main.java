@@ -10,8 +10,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.io.FileReader;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -29,7 +31,11 @@ public class Main extends Application {
         Controller controller = loader.getController();
         List<Draw> elements = new ArrayList<>();
         List<Coordinate> streetCoor = new ArrayList<>();
-
+        List<String>  linepath = new ArrayList<>();
+        List<Stop>  arraystop = new ArrayList<>();
+        Line line;
+        List<Coordinate> arraypath = new ArrayList<>();
+        List<Street> arraystreet = new ArrayList<>();
         JSONParser parser = new JSONParser();
         try {
             Object obj = parser.parse(new FileReader("data/data.json"));
@@ -43,12 +49,13 @@ public class Main extends Application {
 
                 JSONArray ArrayCoordinates = (JSONArray) StreetObj.get("coordinates");
                 for (int k = 0; k < ArrayCoordinates.size(); k++) {
-                    JSONObject CoorObj = (JSONObject) ArrayCoordinates .get(k);
+                    JSONObject CoorObj = (JSONObject) ArrayCoordinates.get(k);
                     String xcoor =(String) CoorObj.get("x");
                     String ycoor = (String) CoorObj.get("y");
                     double x = Double.parseDouble(xcoor);
                     double y = Double.parseDouble(ycoor);
                     streetCoor.add(new Coordinate(x, y));
+
 
                     System.out.println(xcoor);
                     System.out.println(ycoor);
@@ -58,6 +65,7 @@ public class Main extends Application {
                 System.out.println("Size of list = " + size);
                 for(int l = 0; l < (size - 1); l++ ){
                     elements.add(new Street(name, streetCoor.get(l), streetCoor.get(l+1)));
+                    arraystreet.add(new Street(name, streetCoor.get(l), streetCoor.get(l+1)));
                 }
 
 
@@ -70,29 +78,68 @@ public class Main extends Application {
                     String yStop = (String) StopObj.get("y");
                     double stopx = Double.parseDouble(xStop);
                     double stopy = Double.parseDouble(yStop);
-                    //elements.add(new Stop(new Coordinate(stopx,stopy), nameStop, name));
+                    elements.add(new Stop(new Coordinate(stopx,stopy), nameStop, name));
+                    arraystop.add(new Stop(new Coordinate(stopx,stopy), nameStop, name));
+                    /*System.out.println(arraystop.get(j));
+                    elements.add(arraystop.get(j));*/
                 }
 
+
                 streetCoor.clear();
+            }
+
+            JSONObject jsonObjLINE = (JSONObject)obj;
+            JSONArray ArrayLine = (JSONArray) jsonObjLINE.get("line");
+            for (int m = 0; m < ArrayLine.size(); m++) {
+                JSONObject LineObj = (JSONObject) ArrayLine.get(m);
+                String LineNum = (String) LineObj.get("lineNumber");
+                System.out.println(LineNum);
+                JSONArray ArrayPath = (JSONArray) LineObj.get("StopList");
+                /*Iterator<String> iterator = ArrayPath.iterator();
+                while(iterator.hasNext()) {
+                    System.out.println(iterator.next());
+                }*/
+                for(int n = 0; n < ArrayPath.size(); n++ ){
+                    linepath.add((String) ArrayPath.get(n));
+                    System.out.println(linepath.get(n));
+                }
+
+
+                line = new Line(LineNum, linepath);
+                arraypath = line.getRealPath(arraystop, arraystreet);
+                for (int o = 0; o<arraypath.size(); o++){
+                    System.out.println(arraypath.get(o));
+                }
+
+                elements.add(new Bus(LineNum, arraypath.get(0), 20, new Path(arraypath)));
+
+                linepath.clear();
+                //arraypath.clear();
+
+
+
+
+
             }
 
         } catch(Exception e) {
             e.printStackTrace();
         }
+        //elements.add(new Bus("1", new Coordinate(100, 100), 20, new Path(arraypath)));
 
         //linka 1 -  W Z I H G X D
-        elements.add(new Bus(new Coordinate(100, 100), 20, new Path(Arrays.asList(
+        /*elements.add(new Bus("1", new Coordinate(100, 100), 20, new Path(Arrays.asList(
                 new Coordinate(60, 60),
                 new Coordinate(480, 125),
                 new Coordinate(520, 250),
                 new Coordinate(320, 395),
-                new Coordinate(300, 500),
+        new Coordinate(300, 500),
                 new Coordinate(560, 700),
                 new Coordinate(300, 750),
                 new Coordinate(120, 600)
-        ))));
+        ))));*/
         //linka 2 - Y K O R E B A
-        elements.add(new Bus(new Coordinate(100, 100), 20, new Path(Arrays.asList(
+       /* elements.add(new Bus("2", new Coordinate(100, 100), 20, new Path(Arrays.asList(
                 new Coordinate(560, 700),
                 new Coordinate(940, 840),
                 new Coordinate(850, 570),
@@ -104,7 +151,7 @@ public class Main extends Application {
 
         ))));
         // linka 3 - Z S T U N R J
-        elements.add(new Bus(new Coordinate(100, 100), 20, new Path(Arrays.asList(
+        elements.add(new Bus( "3", new Coordinate(100, 100), 20, new Path(Arrays.asList(
                 new Coordinate(480, 125),
                 new Coordinate(520, 250),
                 new Coordinate(750, 410),
@@ -114,7 +161,7 @@ public class Main extends Application {
                 new Coordinate(560, 700),
                 new Coordinate(850, 570)
         ))));
-
+        */
 
 
         controller.setElements(elements);

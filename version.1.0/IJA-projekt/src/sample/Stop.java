@@ -20,11 +20,23 @@ public class Stop  implements Draw {
         this.on_street = on_street;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public Coordinate getCoordinates() {
+        return coordinates;
+    }
+
+    public String getOn_street() {
+        return on_street;
+    }
+
     @Override
     public List<Shape> getGUI(){
         return Arrays.asList(
-                //new Text((start.getX() + stop.getX()) / 2, (start.getY() + stop.getY())/ 2 , id),
-                new Circle(coordinates.getX(), coordinates.getY(), 20, Color.AQUA)
+                new Circle(coordinates.getX(), coordinates.getY(), 15, Color.AQUA),
+                new Text(coordinates.getX(), coordinates.getY(), name)
 
         );
     }

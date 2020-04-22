@@ -3,6 +3,7 @@ package sample;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
+import javafx.scene.text.Text;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -15,13 +16,16 @@ public class Bus implements Draw, TimeUpdate {
     private double distance = 0;
     private Path path;
     private List<Shape> gui;
+    private String id;
 
-    public Bus(Coordinate position, double speed, Path path) {
+    public Bus(String id, Coordinate position, double speed, Path path) {
         this.position = position;
         this.speed = speed;
         this.path = path;
+        this.id = id;
         gui = new ArrayList<>();
         gui.add(new Circle(position.getX(), position.getY(), 12, Color.RED));
+        gui.add(new Text(position.getX(), position.getY(), id));
     }
     private void moveGUI(Coordinate coordinate){
         for(Shape shape : gui){
