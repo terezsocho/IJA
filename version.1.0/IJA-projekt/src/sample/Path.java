@@ -18,7 +18,7 @@ public class Path {
         double len = 0;
         Coordinate a = null;
         Coordinate b = null;
-        for (int i = 0; i < path.size() - 1; i++ ){
+        for (int i = 0; i < path.size() - 1; i++){
              a = path.get(i);
              b = path.get(i+1);
 

@@ -11,15 +11,12 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class Controller {
-
     @FXML
     private Pane map_box;
     private List<TimeUpdate> updates = new ArrayList<>();
     private List<Draw> elements = new ArrayList<>();
     private Timer timer;
     private LocalTime time = LocalTime.now();
-
-
     @FXML
     private void onZoom(ScrollEvent event_zoom){
        // System.out.println("controller linked");
@@ -31,19 +28,15 @@ public class Controller {
         map_box.layout();
 
     }
-
     public void setElements(List<Draw> elements) {
         this.elements = elements;
         for (Draw draw : elements){
             map_box.getChildren().addAll(draw.getGUI());
             if (draw instanceof TimeUpdate){
                 updates.add((TimeUpdate) draw);
-
             }
         }
-
     }
-
     public void startTime(){
         timer = new Timer(false);
         timer.scheduleAtFixedRate(new TimerTask() {

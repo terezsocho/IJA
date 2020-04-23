@@ -47,8 +47,8 @@ public class Line {
         }
 
 //*******************************************************************************************
-        street =  temp_array_street.get(0); // assign first street too variable street
-        for (int i = 0; i<path.size(); i++){
+        street = temp_array_street.get(0); // assign first street too variable street
+        for (int i = 0; i < path.size(); i++){
             //System.out.println(stopname);
             //System.out.println(arraystop.get(i).getName());
             if (( i == 0 ) || ( i == (path.size()-1))){//if first or last item is detected
@@ -67,24 +67,8 @@ public class Line {
                     } else {
                         realpath.add(street.get_End_coord());
                     }
-                    /*start = temp_array_street.get(i-1).getStart();
-                    end = temp_array_street.get(i-1).getStop();
-
-                    if(temp_array.get(i).getCoordinates().getX()){
-                        realpath.add(start);
-                    }
-                    else{
-                        realpath.add(end);
-                    }
-
-                    //System.out.println("to be continued");
-*/
-
                     realpath.add(temp_array_stops.get(i).getCoordinates());
                 }
-                //if(path.get(i)){}
-
-
             }
 
             streetname = temp_array_stops.get(i).getOn_street();
@@ -94,7 +78,6 @@ public class Line {
         /*for (int o = 0; o<realpath.size(); o++){
                     System.out.println(realpath.get(o));
         }*/
-
 
         //realpath.add(new Coordinate(12,15));
         return realpath;
