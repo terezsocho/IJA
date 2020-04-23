@@ -10,33 +10,33 @@ import java.util.List;
 
 public class Street  implements Draw {
 
-    private Coordinate start;
-    private Coordinate stop;
+    private Coordinate start_coord;
+    private Coordinate end_coord;
     private String id;
 
     public Street(String id, Coordinate start, Coordinate stop) {
         this.id = id;
-        this.start = start;
-        this.stop = stop;
+        this.start_coord = start;
+        this.end_coord = stop;
     }
 
     public String getId() {
         return id;
     }
 
-    public Coordinate getStart() {
-        return start;
+    public Coordinate get_Start_coord() {
+        return start_coord;
     }
 
-    public Coordinate getStop() {
-        return stop;
+    public Coordinate get_End_coord() {
+        return end_coord;
     }
 
     @Override
     public List<Shape> getGUI(){
         return Arrays.asList(
-                new Text((start.getX() + stop.getX()) / 2, (start.getY() + stop.getY())/ 2 , id),
-                new Line(start.getX(), start.getY(), stop.getX(), stop.getY())
+                new Text((start_coord.getX() + end_coord.getX()) / 2, (start_coord.getY() + end_coord.getY())/ 2 , id),
+                new Line(start_coord.getX(), start_coord.getY(), end_coord.getX(), end_coord.getY())
         );
     }
 }
