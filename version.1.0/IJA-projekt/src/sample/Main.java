@@ -15,7 +15,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-
+import java.util.TimerTask;
+import java.util.Timer;
 public class Main extends Application {
 
     @Override
@@ -36,11 +37,13 @@ public class Main extends Application {
         List<Stop>  arraystop = new ArrayList<>();
         JSONParser parser = new JSONParser();
 
+
         try {
             //each parsing needs new object
             Object obj = parser.parse(new FileReader("data/data.json"));
             streets_dejson(obj, arraystop, arraystreet, streetCoor, elements);
             lines_dejson(obj, arraypath, line, linepath, elements, arraystop, arraystreet);
+
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -133,12 +136,11 @@ public class Main extends Application {
                  System.out.println(arraypath.get(o));
             }*/
 
-            elements.add(new Bus(LineNum, arraypath.get(0), 20, new Path(arraypath)));
-
+            List<Coordinate> finalArraypath = arraypath;
+            elements.add(new Bus(LineNum, arraypath, 20, new Path(arraypath)));
             linepath.clear();
-            //arraypath.clear();
         }
-
+    return;
     }
 
 
