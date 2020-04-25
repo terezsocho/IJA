@@ -1,5 +1,4 @@
-package sample;
-
+import Interfaces.Draw;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
@@ -36,8 +35,11 @@ public class Stop  implements Draw {
     public List<Shape> getGUI(){
         return Arrays.asList(
                 new Circle(coordinates.getX(), coordinates.getY(), 15, Color.AQUA),
-                new Text(coordinates.getX(), coordinates.getY(), name)
-
+                new Text(coordinates.getX()-7.5, coordinates.getY()+5, name) //constants just for visual fixes
         );
+    }
+    @Override
+    public String getId(){
+        return this.name;
     }
 }

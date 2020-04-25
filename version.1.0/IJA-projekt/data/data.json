@@ -475,19 +475,53 @@
    "line":[
       {
          "lineNumber":"1",
-         "StopList":[ "W1", "W2", "Z1", "I1", "I2", "H1", "G1", "X2", "X1", "D2", "D1" ]
+         "StopList":[ "W1", "W2", "Z1", "I1", "I2", "H1", "G1", "X2", "X1", "D2", "D1" ],
+         "LeavesAt": "10:43:15"
       },
       {
          "lineNumber":"2",
-         "StopList":[ "Y1", "Y2", "Y3", "K1", "O1", "R1", "X2", "X1", "D2", "D1", "C2", "C1", "A2", "A1" ]
+         "StopList":[ "Y1", "Y2", "Y3", "K1", "O1", "R1", "X2", "X1", "D2", "D1", "C2", "C1", "A2", "A1" ],
+         "LeavesAt": "10:43:16"
       },
       {
          "lineNumber":"3",
-         "StopList":[ "Z1", "S1", "S2", "T1", "U1", "U2", "U3", "N1", "R1", "J2", "J1" ]
+         "StopList":[ "Z1", "S1", "S2", "T1", "U1", "U2", "U3", "N1", "R1", "J2", "J1" ],
+         "LeavesAt": "10:43:17"
       },
       {
          "lineNumber":"4",
-         "StopList":[ "B1", "B2"]
+         "StopList":[ "B1", "B2"],
+         "LeavesAt": "10:43:15"
+      },
+      {
+         "lineNumber":"5",
+         "StopList":[ "P1", "P2","P3", "P4"],
+         "LeavesAt": "10:43:26"
+      },
+      {
+         "lineNumber":"1",
+         "StopList":[ "W1", "W2", "Z1", "I1", "I2", "H1", "G1", "X2", "X1", "D2", "D1" ],
+         "LeavesAt": "10:43:22"
+      },
+      {
+         "lineNumber":"2",
+         "StopList":[ "Y1", "Y2", "Y3", "K1", "O1", "R1", "X2", "X1", "D2", "D1", "C2", "C1", "A2", "A1" ],
+         "LeavesAt": "10:43:22"
+      },
+      {
+         "lineNumber":"3",
+         "StopList":[ "Z1", "S1", "S2", "T1", "U1", "U2", "U3", "N1", "R1", "J2", "J1" ],
+         "LeavesAt": "10:43:22"
+      },
+      {
+         "lineNumber":"4",
+         "StopList":[ "B1", "B2"],
+         "LeavesAt": "10:43:22"
+      },
+      {
+         "lineNumber":"5",
+         "StopList":[ "P1", "P2","P3", "P4"],
+         "LeavesAt": "10:43:22"
       }
    ]
 }

@@ -1,5 +1,4 @@
-package sample;
-
+import Interfaces.Draw;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
@@ -8,7 +7,7 @@ import java.util.Arrays;
 
 import java.util.List;
 
-public class Street  implements Draw {
+public class Street implements Draw {
 
     private Coordinate start_coord;
     private Coordinate end_coord;
