@@ -1,8 +1,11 @@
+package sources;
+
 import Interfaces.Draw;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
+import sources.Coordinate;
 
 import java.util.Arrays;
 

@@ -1,5 +1,4 @@
 package Interfaces;
-
 import java.time.LocalTime;
 
 public interface TimeUpdate {

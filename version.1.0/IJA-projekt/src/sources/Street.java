@@ -1,7 +1,10 @@
+package sources;
+
 import Interfaces.Draw;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
+import sources.Coordinate;
 
 import java.util.Arrays;
 

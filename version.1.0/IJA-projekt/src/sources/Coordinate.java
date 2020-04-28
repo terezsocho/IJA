@@ -1,3 +1,5 @@
+package sources;
+
 import java.util.Objects;
 
 public class Coordinate{
@@ -43,18 +45,18 @@ public class Coordinate{
 
     @Override
     public String toString() {
-        return "Coordinate{" +
+        return "sources.Coordinate{" +
                 "x=" + x +
                 ", y=" + y +
                 '}';
     }
 
-    /*public int diffY(Coordinate c){
+    /*public int diffY(sources.Coordinate c){
         int resultY = this.y - c.getY();
         return resultY;
     }
 
-    public int diffX(Coordinate c){
+    public int diffX(sources.Coordinate c){
         int resultX = this.x - c.getX();
         return resultX;
     }*/
@@ -65,11 +67,11 @@ public class Coordinate{
             return true;
         }
 
-        if (!(o instanceof Coordinate)) {
+        if (!(o instanceof sources.Coordinate)) {
             return false;
         }
 
-        Coordinate coor = (Coordinate) o;
+        sources.Coordinate coor = (sources.Coordinate) o;
 
         return this.x == coor.getX() && this.y == coor.getY();
 
