@@ -39,9 +39,6 @@ public class map_controller {
     private List <LocalTime> transit_schedule = new ArrayList<>();
     private List<LocalTime> array_buslines_leave_times = new ArrayList<>();
 
-
-    //private LocalTime time = LocalTime.now(); //inicializes to a current time
-
     /**
      * Method zooms or unzooms canvas by 10% in each direction depending on scroll direction.
      * @param event_zoom ScrollEvent created by an user during a simulation
