@@ -7,7 +7,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
-
+import javafx.scene.input.MouseEvent;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,20 +31,19 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
      * @param speed
      * @param path
      */
-    public Bus(String id, double speed, Path path, String least_At, List<Stop> bus_line_stops) {
+    public Bus(String id, double speed, Path path, LocalTime least_At, List<Stop> bus_line_stops) {
         this.line_coordinates = path.getPathCoord();
         this.position = path.getPathCoord().get(0);
         this.bus_line_stops = bus_line_stops;
         this.speed = speed / 3.6;//converting kilometers per hour to meters per second
         this.path = path;
         this.id = id;
-        // parsing of hh:mm:ss format
-        int hours = Integer.parseInt(least_At.substring(0, 2));
-        int minutes = Integer.parseInt(least_At.substring(3, 5));
-        int seconds = Integer.parseInt(least_At.substring(6, 8));
-        this.least_At = LocalTime.of(hours, minutes, seconds);
+        this.least_At = least_At;
+
+
         gui.add(new Circle(path.getPathCoord().get(0).getX(), path.getPathCoord().get(0).getY(), 12, Color.RED));
         gui.add(new Text(path.getPathCoord().get(0).getX() - 3.5, path.getPathCoord().get(0).getY() + 4, id));//constants just for visual fixes
+
     }
 
     /**
@@ -75,6 +74,7 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
                 if (getDistance(position, line_coordinates.get(index)) < speed && behind_bus_stop == false) {
                     shape.setTranslateX((line_coordinates.get(index).getX() - position.getX()) + shape.getTranslateX());
                     shape.setTranslateY((line_coordinates.get(index).getY() - position.getY()) + shape.getTranslateY());
+                    //shape.toFront();
                     text_and_bus_passed++;
                     if (text_and_bus_passed % 2 == 0) {//there are 2 elements in gui, text and circle.. both need to go together
                         behind_bus_stop = true;//set true so next calculation is not according to old bus stop
@@ -117,7 +117,7 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
 
     boolean set_immutable_bus_stop = true;
     @Override
-    public void update(LocalTime time) {
+    public Coordinate update(LocalTime time) {
         if (time.isAfter(least_At)) {
             //System.out.println("Time is: " + time);
             distance = distance + speed;
@@ -130,16 +130,13 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
                     removeGUI();
                     set_immutable_bus_stop = false;
                 }
-                return; //break before moveGUI happens again
+                return null; //break before moveGUI happens again
             }
             Coordinate coords = path.getCoorBus(distance);
             moveGUI(coords);
+            return coords;
         }
-    }
-
-    @Override
-    public List<Shape> getLineSchedule() {
-        return gui;
+        return null;
     }
 
     @Override
