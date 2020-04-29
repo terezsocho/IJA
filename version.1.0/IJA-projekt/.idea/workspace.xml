@@ -20,11 +20,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cdb932d9-7e58-4d94-93a9-e7b232ef17da" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/IJA-projekt/Controllers/map_controller$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/IJA-projekt/Controllers/map_controller$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/IJA-projekt/Controllers/map_controller.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/IJA-projekt/Controllers/map_controller.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/sources/Coordinate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/sources/Coordinate.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/sources/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/sources/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/sources/Bus.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/sources/Bus.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/sources/BusLine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/sources/BusLine.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -246,7 +243,7 @@
       <workItem from="1587803876229" duration="11425000" />
       <workItem from="1587896476856" duration="25118000" />
       <workItem from="1588064288190" duration="41096000" />
-      <workItem from="1588145010940" duration="23731000" />
+      <workItem from="1588145010940" duration="24449000" />
     </task>
     <servers />
   </component>

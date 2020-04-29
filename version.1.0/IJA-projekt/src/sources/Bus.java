@@ -27,9 +27,12 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
     private LocalTime least_At;
 
     /**
-     * @param id
-     * @param speed
-     * @param path
+     * Constructor for Bus elements.
+     * @param id identification String of a busLine
+     * @param speed Speed of a vehicle
+     * @param path List of Coordinates for specific busline that each bus on thta bus line must pass
+     * @param least_At List of LocalTimes that showcase departure times of all buses on busline from their first stop
+     * @param bus_line_stops List of Stops on a bus route
      */
     public Bus(String id, double speed, Path path, LocalTime least_At, List<Stop> bus_line_stops) {
         this.line_coordinates = path.getPathCoord();
@@ -39,22 +42,24 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
         this.path = path;
         this.id = id;
         this.least_At = least_At;
-
-
         gui.add(new Circle(path.getPathCoord().get(0).getX(), path.getPathCoord().get(0).getY(), 12, Color.RED));
         gui.add(new Text(path.getPathCoord().get(0).getX() - 3.5, path.getPathCoord().get(0).getY() + 4, id));//constants just for visual fixes
-
     }
 
     /**
-     * @param a
-     * @param b
-     * @return
+     * Method calculates distance needed for travel between two specified coordinates in meters.
+     * @param a Coordinate of starting position for calculation of distance
+     * @param b Coordinate of end position for calculation of distance
+     * @return Double value of distance to travel between two coordinates
      */
     private double getDistance(Coordinate a, Coordinate b) {
         return Math.sqrt(Math.pow(a.getX() - b.getX(), 2) + Math.pow(a.getY() - b.getY(), 2));
     }
 
+    /**
+     * Method returns identification information of a busline
+     * @return String containing a name of busline
+     */
     @Override
     public String getId() {
         return this.id;
@@ -66,6 +71,11 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
     int text_and_bus_passed = 0;//variable to count drawn objects, bcs every iteration needs 2(text, circle)
     boolean waiting_at_bus_stop = false;//boolean to check if bus is at bus stop
 
+    /**
+     * Method moves buses on a canvas, to their next position calculated from their speed. If next step would cause
+     * travel behind a bus stop on its route, new position is calculated to prohibit that.
+     * @param coordinate Coordinate of next position that bus should be moved to
+     */
     private void moveGUI(Coordinate coordinate) {
         for (Shape shape : gui) {
             shape.setVisible(true);
@@ -101,12 +111,19 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
         }
     }
 
+    /**
+     * Method removes buses from a canvas once they reach their final stop.
+     */
     private void removeGUI() {
         for (Shape shape : gui) {
             shape.setVisible(false);//toggle visibility to false
         }
     }
 
+    /**
+     * Method sets all buses to not be visible until their departure time
+     * @return List of Shapes to be drawn onto canvas
+     */
     @Override
     public List<Shape> getGUI() {
         for (Shape shape : gui) {
@@ -115,7 +132,14 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
         return gui;
     }
 
+
     boolean set_immutable_bus_stop = true;
+
+    /**
+     * Method updates positions of a bus on a canvas to its next position
+     * @param time LocalTime variable used to determine if bus is up for departure
+     * @return Coordinate of current bus position.
+     */
     @Override
     public Coordinate update(LocalTime time) {
         if (time.isAfter(least_At)) {

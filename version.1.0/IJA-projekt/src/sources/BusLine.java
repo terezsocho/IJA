@@ -15,11 +15,23 @@ public class BusLine {
     public BusLine(String id, List<String> path) {
         this.id = id;
         this.path = path;
-
     }
+
+    /**
+     * Method returns all stops for a specific busline on its route
+     * @return List of Stops
+     */
     public List<Stop> getStops(){
         return temp_array_stops;
     }
+
+    /**
+     * Method creates final list of all Coordinates that bus must pass on its route. All stops it needs to make such as
+     * intersectons or bus stops.
+     * @param arraystop List of all Stops in a simulation
+     * @param arraystreet List of all Streets in a simulation
+     * @return List of final Coordinates for specific busline path
+     */
     public List<Coordinate> getRealPath(List<Stop> arraystop, List<Street> arraystreet) {
         for (int r = 0; r < path.size(); r++) {
             for (int p = 0; p < arraystop.size(); p++) {
