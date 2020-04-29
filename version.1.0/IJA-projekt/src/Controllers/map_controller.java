@@ -3,23 +3,17 @@ package Controllers;
 import Interfaces.Draw;
 import Interfaces.LineInfo;
 import Interfaces.TimeUpdate;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import sources.Coordinate;
 import sources.Stop;
-
-import java.math.BigDecimal;
-import java.time.Duration;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.List;
@@ -30,8 +24,6 @@ public class map_controller {
     @FXML
     private Pane display = null;
 
-    @FXML
-    private TableColumn<String, LocalTime> tcScreenName;
     @FXML
     private TextField input_text_field;
     private List<TimeUpdate> updates = new ArrayList<>();
@@ -50,6 +42,10 @@ public class map_controller {
 
     //private LocalTime time = LocalTime.now(); //inicializes to a current time
 
+    /**
+     * Method zooms or unzooms canvas by 10% in each direction depending on scroll direction.
+     * @param event_zoom ScrollEvent created by an user during a simulation
+     */
     @FXML
     private void onZoom(ScrollEvent event_zoom){
        // System.out.println("controller linked");
@@ -60,6 +56,11 @@ public class map_controller {
         map_box.setScaleY(zoom * map_box.getScaleY());
         map_box.layout();
     }
+
+    /**
+     * Method scales time. Using the value from Input text field.
+     * If wrong format of data is inserted method informs user about it.
+     */
     @FXML
     private void onTimeScaleChange(){
         double scale = 1.0;
@@ -78,6 +79,16 @@ public class map_controller {
         timer.cancel();//stop previous timer
         startTime(scale);//initiate new timer
     }
+
+    /**
+     * Method sets and imports all the important variables as well as draws initial City Map. Buses are not visible until
+     * they leave the first bus stop on their route.
+     * @param elements_roads List of Drawable objects containing streets and their names
+     * @param elements_stops List of Drawable objects containing stops and their names
+     * @param elements_vehicles List of Drawable objects containing buses and their names
+     * @param array_buslines_numbers List of Strings that contains all possible bus line numbers
+     * @param array_buslines_leave_times List of LocalTimes that contains all the departure times of all buses in simulation
+     */
     public void setElements(List<Draw> elements_roads, List<Draw> elements_stops, List<Draw> elements_vehicles,
                             List<String> array_buslines_numbers, List<LocalTime> array_buslines_leave_times) {
 
@@ -106,6 +117,10 @@ public class map_controller {
         }
     }
 
+    /**
+     * Method creates timertask to be repeated every second to simulate movement of buses.
+     * @param scale Double value used during fastening of the simulation
+     */
     public void startTime(double scale){
         timer = new Timer(false);
 
@@ -116,6 +131,7 @@ public class map_controller {
                 System.out.println("Time is: " + time);
                     //for (TimeUpdate update : updates) {
                 for (int index = 0; index<updates.size()-1; index++) {
+                    //set current position of bus using timertask
                     buses_current_positions.set(index, updates.get(index).update(time));
                     map_box.layout();
                 }
@@ -123,6 +139,10 @@ public class map_controller {
         }, 0,(long) (1000/scale));//period establishes duration between updates
     }
 
+    /**
+     * Method gather user input from mouse click and highlights specific busline.
+     * @param mouse_clicked MouseEvent variable used in further checks to determine position of click on canvas
+     */
     @FXML
     private void getLineInfo(MouseEvent mouse_clicked) {
         List<Coordinate> stops_coordinates = new ArrayList<>();
@@ -153,7 +173,6 @@ public class map_controller {
                 temp_line.setStrokeWidth(2.0);//set it thicker than before
                 map_box.getChildren().add(temp_line);//add it to scene over previously set values
 
-
                 for (Coordinate stop_coord : stops_coordinates) {//loop through all coordinates of stops
                     if (stop_coord.equals(temp_path.get(index))) {//if currently examined coordinate is stop set new color and name
                         map_box.getChildren().add(new Circle(temp_path.get(index).getX(), temp_path.get(index).getY(), 15, Color.YELLOW));
@@ -168,8 +187,14 @@ public class map_controller {
                 //set end of route of busline
                 int index_of_last_stop = temp_path.size() - 1;
                 int index_of_last_namestop = stops_names.size() - 1;
-                map_box.getChildren().add(new Circle(temp_path.get(index_of_last_stop).getX(), temp_path.get(index_of_last_stop).getY(), 15, Color.YELLOW));
-                map_box.getChildren().add(new Text(temp_path.get(index_of_last_stop).getX() - 7.5, temp_path.get(index_of_last_stop).getY() + 5, stops_names.get(index_of_last_namestop)));
+                double last_stop_x_coord = temp_path.get(index_of_last_stop).getX();
+                double last_stop_y_coord = temp_path.get(index_of_last_stop).getY();
+                String last_stop_name = stops_names.get(index_of_last_namestop);
+
+                map_box.getChildren().add(
+                        new Circle(last_stop_x_coord, last_stop_y_coord, 15, Color.YELLOW));
+                map_box.getChildren().add(
+                        new Text(last_stop_x_coord - 7.5, last_stop_y_coord + 5, last_stop_name));
             }
             stops_index_at.add(temp_path.size() - 1);//add last stop index
             Coordinate current_bus_position = new Coordinate(x,y);
@@ -194,6 +219,13 @@ public class map_controller {
 
     }
 
+    /**
+     * Method determines which bus symbol was clicked. Thus establishes which busline is going to be highlighted.
+     * @param mouse_clicked MouseEvent variable used in further checks
+     * @param x Double value of x coordinate of chosen bus symbol
+     * @param y Double value of y coordinate of chosen bus symbol
+     * @return Index in List of Coordinates buses_current_positions, that points to clicked bus symbol on canvas
+     */
     private int checkClickedBusLine(MouseEvent mouse_clicked, double x, double y){
         double clickedX = mouse_clicked.getX();
         double clickedY = mouse_clicked.getY();
@@ -213,13 +245,28 @@ public class map_controller {
         }
         return -2; //return number out of bounds if nothing found
     }
-    
+
+    /**
+     * Method calculates time needed for travel between two specified coordinates in seconds.
+     * @param a Coordinate of starting position for calculation of distance and consecutively time
+     * @param b Coordinate of end position for calculation of distance and consecutively time
+     * @return Double value of seconds to travel between two coordinates
+     */
     private double getDelayAtNextStop(Coordinate a, Coordinate b){
         double distance = Math.sqrt(Math.pow(a.getX() - b.getX(),2) + Math.pow(a.getY() - b.getY(),2));
         double seconds_to_travel = distance / (55/3.6); // constant 55 is speed of vehicles - rework to get it from Bus.class
         return seconds_to_travel;
     }
 
+    /**
+     * Method creates transit schedule for specific bus on chosen busline.
+     * @param transit_schedule List of LocalTimes containing time departure for each stop
+     * @param temp_path List of Coordinates containing all places where bus need to stop. Intersections, Bus stops.
+     * @param index_clicked_busline Int value defining which busline is examined and transit schedule is created for.
+     * @param current_bus_position Coordinate of current position of chosen bus on chosen busline
+     * @param stops_index_at List of Integers defining indexes that are bus stops in temp_path
+     * @return Index of closest bus stop from position when transit schedule was loaded.
+     */
     private int createTransitSchedule(List <LocalTime> transit_schedule, List<Coordinate> temp_path,
                                       int index_clicked_busline, Coordinate current_bus_position,
                                       List<Integer> stops_index_at){
@@ -256,6 +303,13 @@ public class map_controller {
         return temp_index;
     }
 
+    /**
+     * Method display final transit schedule on left Pane. For every stop there is departure time.
+     * Small deviations in departure time may occur.
+     * @param transit_schedule List of LocalTimes containing time departure for each stop
+     * @param stops_names List of String containtin name for each stop
+     * @param index_of_closest Int value containing index in stop_names that contains closest bus stop
+     */
     private void displayTransitSchedule(List <LocalTime> transit_schedule, List<String> stops_names, int index_of_closest){
         String temp ="\t  Transit Schedule\n\n";
         for (int i=0; i < transit_schedule.size();i++) {
