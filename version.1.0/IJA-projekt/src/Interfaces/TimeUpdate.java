@@ -1,6 +1,8 @@
 package Interfaces;
+import sources.Coordinate;
+
 import java.time.LocalTime;
 
 public interface TimeUpdate {
-    void update(LocalTime time );
+    Coordinate update(LocalTime time );
 }
