@@ -163,11 +163,19 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
         return null;
     }
 
+    /**
+     * Method returns busline coordinates for each bus on this route to be passed.
+     * @return List of Coordinates
+     */
     @Override
     public List<sources.Coordinate> getLinePath() {
         return line_coordinates;
     }
 
+    /**
+     * Method returns busline stops for each bus on this route to be stopped at.
+     * @return List of Stops
+     */
     @Override
     public List<Stop> getLinePathStops() {
         return bus_line_stops;
