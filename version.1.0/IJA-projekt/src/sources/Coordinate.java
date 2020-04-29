@@ -9,17 +9,22 @@ public class Coordinate{
     public Coordinate (double x, double y){
         this.x = x;
         this.y = y;
-
     }
 
+    /**
+     * Method returns x value of coordinate
+     * @return double value of x coordinate
+     */
     public double getX(){
         return this.x;
     }
 
-    public double getY(){
+    /**
+     * Method returns y value of coordinate
+     * @return double value of y coordinate
+     */
+    public double getY(){  return this.y; }
 
-        return this.y;
-    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -28,7 +33,6 @@ public class Coordinate{
         return Double.compare(that.x, x) == 0 &&
                 Double.compare(that.y, y) == 0;
     }
-
     @Override
     public int hashCode() {
         return Objects.hash(x, y);
@@ -38,30 +42,4 @@ public class Coordinate{
     public String toString() {
         return  "x=" + x +", y=" + y;
     }
-
-    /*public int diffY(sources.Coordinate c){
-        int resultY = this.y - c.getY();
-        return resultY;
-    }
-
-    public int diffX(sources.Coordinate c){
-        int resultX = this.x - c.getX();
-        return resultX;
-    }*/
-
-    /*@Override
-    public boolean equals(Object o){
-        if (o == this) {
-            return true;
-        }
-
-        if (!(o instanceof sources.Coordinate)) {
-            return false;
-        }
-
-        sources.Coordinate coor = (sources.Coordinate) o;
-
-        return this.x == coor.getX() && this.y == coor.getY();
-
-    }*/
 }

@@ -49,7 +49,15 @@ public class Main extends Application {
         map_controller.startTime(1.0);
     }
 
-
+    /**
+     * Method gather data from JSON and stores them into appropriate variables.
+     * @param obj Object containing JSOM data
+     * @param stops_list List of all Stops
+     * @param streets_list List of all Streets
+     * @param street_Coordinates List of all Coordinates that create streets
+     * @param elements_roads List of Drawable objects containing streets and their names
+     * @param elements_stops List of Drawable objects containing stops and their names
+     */
     public void City_Map_Init(Object obj, List<Stop> stops_list,List<Street> streets_list, List<Coordinate> street_Coordinates,
                               List<Draw> elements_roads, List<Draw> elements_stops ){
         JSONObject jsonObject = (JSONObject)obj; // conversion of object to jsonobject
@@ -83,13 +91,16 @@ public class Main extends Application {
     }
 
     /**
-     * @param obj parsed data from file data.json
-     * @param path_Coord_list list of coordinates
-     * @param bus_Route line that vehicles travels on
-     * @param bus_Route_path list of string(names of stops)
-     * @param elements_vehicles list of eleemnts to be drawn onto a screen
-     * @param stops_list list of stops for a street
-     * @param streets_list list of streets
+     * Method initializes traffic from data gathered from JSON.
+     * @param obj Object containing JSOM data
+     * @param path_Coord_list List of Coordinates that bus must pass on its route
+     * @param bus_Route List of Strings that illustrate stops from which bus path is created
+     * @param bus_Route_path List of all Coordinates that create busline path
+     * @param elements_vehicles List of Drawable objects containing buses and their names
+     * @param stops_list List of all Stops
+     * @param streets_list List of all Streets
+     * @param array_buslines_numbers List of Strings that contains all possible bus line numbers
+     * @param transit_schedule List of LocalTimes that contains all the departure times of all buses in simulation
      */
     public void Traffic_Init(Object obj, List<Coordinate> path_Coord_list, BusLine bus_Route, List<String> bus_Route_path,
                              List<Draw> elements_vehicles, List<Stop> stops_list, List<Street> streets_list,
