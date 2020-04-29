@@ -20,15 +20,6 @@ public class Coordinate{
 
         return this.y;
     }
-
-    public void setX(double x) {
-        this.x = x;
-    }
-
-    public void setY(double y) {
-        this.y = y;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -45,10 +36,7 @@ public class Coordinate{
 
     @Override
     public String toString() {
-        return "sources.Coordinate{" +
-                "x=" + x +
-                ", y=" + y +
-                '}';
+        return  "x=" + x +", y=" + y;
     }
 
     /*public int diffY(sources.Coordinate c){
