@@ -24,7 +24,13 @@ public class Coordinate{
      * @return double value of y coordinate
      */
     public double getY(){  return this.y; }
+    public void setX(double x) {
+        this.x = x;
+    }
 
+    public void setY(double y) {
+        this.y = y;
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

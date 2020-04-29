@@ -37,6 +37,7 @@ public class map_controller {
     @FXML
     private ChoiceBox<String> choiceBox_level = new ChoiceBox<>();
 
+    public static int NORMAL_BUS_SPEED = 55;
 
     private List<TimeUpdate> updates = new ArrayList<>();
     private List<LineInfo> lines_info = new ArrayList<>();
@@ -179,13 +180,17 @@ public class map_controller {
                     //for (TimeUpdate update : updates) {
                 for (int index = 0; index<updates.size()-1; index++) {
                     //set current position of bus using timertask
-                    buses_current_positions.set(index, updates.get(index).update(time));
+                    buses_current_positions.set(index, updates.get(index).update(time, NORMAL_BUS_SPEED));
                     map_box.layout();
                 }
             }
         }, 0,(long) (1000/scale));//period establishes duration between updates
     }
 
+    public void test_coordinates_for_restrictions(List<Coordinate> temp_path){
+        System.out.println(temp_path);
+        System.out.println();
+    }
     /**
      * Method gather user input from mouse click and highlights specific busline.
      * @param mouse_clicked MouseEvent variable used in further checks to determine position of click on canvas
@@ -198,7 +203,9 @@ public class map_controller {
         mouse_clicked.consume();// to stay in desired pane
         double x = 0.0;
         double y = 0.0;
-        int index_clicked_busline = checkClickedBusLine(mouse_clicked,x, y);
+        Coordinate current_bus_position = new Coordinate(x,y);
+
+        int index_clicked_busline = checkClickedBusLine(mouse_clicked, current_bus_position);
 
         //if index is one of the bus line's instances and another bus line is not chosen go inside an if statement
         if (((index_clicked_busline >= 0 && index_clicked_busline <= lines_info.size()-1)) && bus_line_already_chosen == false) {
@@ -207,7 +214,6 @@ public class map_controller {
             List<Stop> temp_path_stops = lines_info.get(index_clicked_busline).getLinePathStops();
             //get all important coordinates bus passes through
             List<Coordinate> temp_path = lines_info.get(index_clicked_busline).getLinePath();
-
             for (Stop stop : temp_path_stops) { //parsing of stops
                 stops_coordinates.add(stop.getCoordinates());//store coordinate of stop
                 stops_names.add(stop.getName());//store name of stop
@@ -244,10 +250,11 @@ public class map_controller {
                         new Text(last_stop_x_coord - 7.5, last_stop_y_coord + 5, last_stop_name));
             }
             stops_index_at.add(temp_path.size() - 1);//add last stop index
-            Coordinate current_bus_position = new Coordinate(x,y);
+
             int index_of_closest = createTransitSchedule(transit_schedule, temp_path, index_clicked_busline,
                                                          current_bus_position,stops_index_at);
-            displayTransitSchedule(transit_schedule, stops_names, index_of_closest);
+            String name_of_chosen_busline = array_buslines_numbers.get(index_clicked_busline);
+            displayTransitSchedule(transit_schedule, stops_names, index_of_closest, name_of_chosen_busline);
         }
         else {//repaint Yellow lines of chosen busline back to black and aqua
             display.getChildren().clear();//clean the transit schedule view
@@ -269,23 +276,23 @@ public class map_controller {
     /**
      * Method determines which bus symbol was clicked. Thus establishes which busline is going to be highlighted.
      * @param mouse_clicked MouseEvent variable used in further checks
-     * @param x Double value of x coordinate of chosen bus symbol
-     * @param y Double value of y coordinate of chosen bus symbol
+     * @param current_bus_position Coordinate reference to current bus position
      * @return Index in List of Coordinates buses_current_positions, that points to clicked bus symbol on canvas
      */
-    private int checkClickedBusLine(MouseEvent mouse_clicked, double x, double y){
+    private int checkClickedBusLine(MouseEvent mouse_clicked,  Coordinate current_bus_position){
         double clickedX = mouse_clicked.getX();
         double clickedY = mouse_clicked.getY();
         for (int index = 0; index < buses_current_positions.size(); index++) {
             try {
-                x = buses_current_positions.get(index).getX();
-                y = buses_current_positions.get(index).getY();
+                current_bus_position.setX(buses_current_positions.get(index).getX());
+                current_bus_position.setY(buses_current_positions.get(index).getY());
             } catch (NullPointerException e) { // coordinates are null until on the road
                 //System.out.println("Bus has not left the station yet.");
                 continue;
             }
             //distance between ceenter of bus symbol and click coordinates
-            double distance = Math.sqrt(Math.pow(clickedX - x, 2) + Math.pow(clickedY - y, 2));
+            double distance = Math.sqrt(Math.pow(clickedX - current_bus_position.getX(), 2)
+                            + Math.pow(clickedY - current_bus_position.getY(), 2));
             if (distance <= 9) {//constant value 9 was estimated to produce best results, simulates radius of bus symbol
                 return index;
             }
@@ -301,7 +308,7 @@ public class map_controller {
      */
     private double getDelayAtNextStop(Coordinate a, Coordinate b){
         double distance = Math.sqrt(Math.pow(a.getX() - b.getX(),2) + Math.pow(a.getY() - b.getY(),2));
-        double seconds_to_travel = distance / (55/3.6); // constant 55 is speed of vehicles - rework to get it from Bus.class
+        double seconds_to_travel = distance / (NORMAL_BUS_SPEED/3.6); // constant 55 is speed of vehicles - rework to get it from Bus.class
         return seconds_to_travel;
     }
 
@@ -340,11 +347,12 @@ public class map_controller {
             else{//if path is not ending in bus stop just add length to overall distance between two stops
                 delay_in_seconds += getDelayAtNextStop(temp1,temp2);
             }
-            for(int p = 0; p < stops_index_at.size(); p++){
-                double temp_distance = getDelayAtNextStop(current_bus_position,temp_path.get(stops_index_at.get(p)));
-                if(temp_distance < delay_from_closest){
-                    temp_index = p;//assign index of closest stop when clicked
-                }
+        }
+        for(int p = 0; p < stops_index_at.size(); p++){
+            double temp_distance = getDelayAtNextStop(current_bus_position,temp_path.get(stops_index_at.get(p)));
+            if(temp_distance < delay_from_closest){
+                temp_index = p;//assign index of closest stop when clicked
+                break;
             }
         }
         return temp_index;
@@ -356,13 +364,14 @@ public class map_controller {
      * @param transit_schedule List of LocalTimes containing time departure for each stop
      * @param stops_names List of String containtin name for each stop
      * @param index_of_closest Int value containing index in stop_names that contains closest bus stop
+     * @param name_of_chosen_busline String value contains name of busline that bus is part of
      */
-    private void displayTransitSchedule(List <LocalTime> transit_schedule, List<String> stops_names, int index_of_closest){
-        String temp ="\t  Transit Schedule\n\n";
+    private void displayTransitSchedule(List <LocalTime> transit_schedule, List<String> stops_names, int index_of_closest, String name_of_chosen_busline){
+        String temp ="\t  Transit Schedule\n"+
+                     "\t\tLine \""+name_of_chosen_busline+"\"\n\n";
         for (int i=0; i < transit_schedule.size();i++) {
             temp += "\t"+stops_names.get(i) + "\t : \t" + transit_schedule.get(i) + "\n";
         }
-        System.out.println(index_of_closest);
         temp += "\n\n\tBus was closest to " +
                 "\n\t\tStop \""+stops_names.get(index_of_closest)+"\"" +
                 "\n\tFor new information " +

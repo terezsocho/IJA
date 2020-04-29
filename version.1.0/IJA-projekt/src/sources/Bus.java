@@ -14,8 +14,8 @@ import java.util.List;
 public class Bus implements Draw, TimeUpdate, LineInfo {
 
     private Coordinate position;
-    private double speed = 0.0;
     private double distance = 0.0;
+    private double speed = 0.0;
     private Path path;
     private List<Shape> gui = new ArrayList<>();
     private String id;
@@ -26,16 +26,14 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
     /**
      * Constructor for Bus elements.
      * @param id identification String of a busLine
-     * @param speed Speed of a vehicle
      * @param path List of Coordinates for specific busline that each bus on thta bus line must pass
      * @param least_At List of LocalTimes that showcase departure times of all buses on busline from their first stop
      * @param bus_line_stops List of Stops on a bus route
      */
-    public Bus(String id, double speed, Path path, LocalTime least_At, List<Stop> bus_line_stops) {
+    public Bus(String id,  Path path, LocalTime least_At, List<Stop> bus_line_stops) {
         this.line_coordinates = path.getPathCoord();
         this.position = path.getPathCoord().get(0);
         this.bus_line_stops = bus_line_stops;
-        this.speed = speed / 3.6;//converting kilometers per hour to meters per second
         this.path = path;
         this.id = id;
         this.least_At = least_At;
@@ -137,10 +135,11 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
      * @return Coordinate of current bus position.
      */
     @Override
-    public Coordinate update(LocalTime time) {
+    public Coordinate update(LocalTime time, double speed) {
+        this.speed = speed / 3.6;//convert speed to metres per sec
         if (time.isAfter(least_At)) {
             //System.out.println("Time is: " + time);
-            distance = distance + speed;
+            distance = distance + this.speed;
             if (distance > path.getPathSize()) {
                 // only moves it to final destination once, if repeated moveGUi still moves it by small margin
                 if (set_immutable_bus_stop == true) {

@@ -45,6 +45,8 @@ public class Main extends Application {
         Object obj = parser.parse(new FileReader("data/data.json"));
         City_Map_Init(obj, arraystop, arraystreet, streetCoor, elements_roads, elements_stops);
         Traffic_Init(obj, arraypath, busLine, linepath, elements_vehicles, arraystop, arraystreet, array_buslines_numbers, array_buslines_leave_times);
+        System.out.println("Size of buslines"+array_buslines_numbers.size());
+
         map_controller.setElements(elements_roads, elements_stops, elements_vehicles, array_buslines_numbers,
                                     array_buslines_leave_times, arraystreet );
         map_controller.startTime(1.0);
@@ -132,11 +134,9 @@ public class Main extends Application {
             bus_Route = new BusLine(bus_Route_Number, bus_Route_path); //instantiation of bus_Route
             path_Coord_list = bus_Route.getRealPath(stops_list, streets_list);
             List<Stop> list_stops_bus_route = bus_Route.getStops();
-            if(!array_buslines_numbers.contains(bus_Route_Number))//check if bus number is not already present
-                    array_buslines_numbers.add(bus_Route_Number);//add if not
-
             for(LocalTime schedule: transit_schedule_one_busline){
-                elements_vehicles.add(new Bus(bus_Route_Number, 55, new Path(path_Coord_list), schedule, list_stops_bus_route ));//add a new bus on a road
+                array_buslines_numbers.add(bus_Route_Number);//intentionally contains duplicates
+                elements_vehicles.add(new Bus(bus_Route_Number,  new Path(path_Coord_list), schedule, list_stops_bus_route ));//add a new bus on a road
             }
             transit_schedule_one_busline.clear();
             bus_Route_path.clear();
