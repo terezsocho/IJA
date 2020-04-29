@@ -4,19 +4,25 @@ import Interfaces.Draw;
 import Interfaces.LineInfo;
 import Interfaces.TimeUpdate;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.input.ScrollEvent;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.shape.Circle;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import sources.Coordinate;
 import sources.Stop;
+import sources.Street;
+
 import java.time.LocalTime;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class map_controller {
     @FXML
@@ -26,6 +32,12 @@ public class map_controller {
 
     @FXML
     private TextField input_text_field;
+    @FXML
+    private ChoiceBox<String> choiceBox_street = new ChoiceBox<>();
+    @FXML
+    private ChoiceBox<String> choiceBox_level = new ChoiceBox<>();
+
+
     private List<TimeUpdate> updates = new ArrayList<>();
     private List<LineInfo> lines_info = new ArrayList<>();
     private List<Draw> elements_roads = new ArrayList<>();
@@ -38,6 +50,42 @@ public class map_controller {
     private boolean bus_line_already_chosen = false;
     private List <LocalTime> transit_schedule = new ArrayList<>();
     private List<LocalTime> array_buslines_leave_times = new ArrayList<>();
+    private List<Street> streets_list = new ArrayList<>();
+
+    private List<Street> restriction_lvl_1 = new ArrayList<>();
+    private List<Street> restriction_lvl_2 = new ArrayList<>();
+
+    @FXML
+    private void onRoadRestrictionChange(){
+        String chosen_street = choiceBox_street.getValue();
+        String chosen_level = choiceBox_level.getValue();
+        System.out.println("does nothing " + chosen_street +" + "+ chosen_level);
+        for(Street street : streets_list){
+            if ( chosen_street == street.getId() ){
+                if(chosen_level == "1"){
+                    if(!restriction_lvl_1.contains(street))//check if it is not there
+                        restriction_lvl_1.add(street);
+                    if(restriction_lvl_2.contains(street)) //check if it is not already in different list if so delete
+                        restriction_lvl_2.remove(street);
+                }
+                else if(chosen_level == "2"){
+                    if(!restriction_lvl_2.contains(street))//check if it is not there
+                        restriction_lvl_2.add(street);
+                    if(restriction_lvl_1.contains(street)) //check if it is already in different list if so delete
+                        restriction_lvl_1.remove(street);
+                }
+                else{//remove from lists if set to 0 restriction level
+                    if(restriction_lvl_1.contains(street)) //check if it is not already in different list if so delete
+                        restriction_lvl_1.remove(street);
+                    if(restriction_lvl_2.contains(street)) //check if it is not already in different list if so delete
+                        restriction_lvl_2.remove(street);
+                }
+                System.out.println("LVL1 "+ restriction_lvl_1);
+                System.out.println("LVL2 "+ restriction_lvl_2);
+            }
+        }
+
+    }
 
     /**
      * Method zooms or unzooms canvas by 10% in each direction depending on scroll direction.
@@ -87,13 +135,14 @@ public class map_controller {
      * @param array_buslines_leave_times List of LocalTimes that contains all the departure times of all buses in simulation
      */
     public void setElements(List<Draw> elements_roads, List<Draw> elements_stops, List<Draw> elements_vehicles,
-                            List<String> array_buslines_numbers, List<LocalTime> array_buslines_leave_times) {
+                            List<String> array_buslines_numbers, List<LocalTime> array_buslines_leave_times, List<Street> arraystreet) {
 
         this.array_buslines_leave_times = array_buslines_leave_times;
         this.elements_roads = elements_roads;
         this.elements_stops = elements_stops;
         this.elements_vehicles = elements_vehicles;
         this.array_buslines_numbers = array_buslines_numbers;
+        this.streets_list = arraystreet;
         System.out.println("Number of road elements: "+elements_roads.size());
         for (Draw draw : elements_roads){ //Draw draw = elements[i];
             map_box.getChildren().addAll(draw.getGUI());//paints all the elements onto the scene
@@ -112,6 +161,7 @@ public class map_controller {
             lines_info.add((LineInfo) draw);
             buses_current_positions.add(temp);//add initial coordinates for latter use of list.set() method
         }
+        initChoiceBox();//populates choice boxes
     }
 
     /**
@@ -318,5 +368,22 @@ public class map_controller {
                 "\n\tFor new information " +
                 "\n\tchoose route again.";
         display.getChildren().addAll(new Text(0, 20, temp));//create new "table"
+    }
+
+    /**
+     * Method only populates choice boxes as well as sets default value for each
+     */
+    private void initChoiceBox(){
+        List<String> temp_street_names_list = new ArrayList<>();
+        for(Street street : streets_list){
+            temp_street_names_list.add(street.getId());
+        }
+        choiceBox_street.getItems().addAll(temp_street_names_list);
+        choiceBox_street.setValue(temp_street_names_list.get(0));
+
+        choiceBox_level.getItems().add("0");
+        choiceBox_level.getItems().add("1");
+        choiceBox_level.getItems().add("2");
+        choiceBox_level.setValue("0");
     }
 }

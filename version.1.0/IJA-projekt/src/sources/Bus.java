@@ -7,12 +7,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
-import javafx.scene.input.MouseEvent;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import static java.lang.Math.abs;
 
 public class Bus implements Draw, TimeUpdate, LineInfo {
 
@@ -131,7 +128,6 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
         }
         return gui;
     }
-
 
     boolean set_immutable_bus_stop = true;
 

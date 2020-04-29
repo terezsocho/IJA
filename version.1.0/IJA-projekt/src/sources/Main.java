@@ -45,7 +45,8 @@ public class Main extends Application {
         Object obj = parser.parse(new FileReader("data/data.json"));
         City_Map_Init(obj, arraystop, arraystreet, streetCoor, elements_roads, elements_stops);
         Traffic_Init(obj, arraypath, busLine, linepath, elements_vehicles, arraystop, arraystreet, array_buslines_numbers, array_buslines_leave_times);
-        map_controller.setElements(elements_roads, elements_stops, elements_vehicles, array_buslines_numbers, array_buslines_leave_times);
+        map_controller.setElements(elements_roads, elements_stops, elements_vehicles, array_buslines_numbers,
+                                    array_buslines_leave_times, arraystreet );
         map_controller.startTime(1.0);
     }
 
