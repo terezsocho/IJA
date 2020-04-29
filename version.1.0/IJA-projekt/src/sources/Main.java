@@ -12,6 +12,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.io.FileReader;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,12 +22,14 @@ public class Main extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../Resources/public_transit.fxml"));
         Parent root = loader.load();// the root of the scene shown in the main window
         primaryStage.setTitle("Application of public transport");
-        primaryStage.setScene(new Scene(root, 1100, 950));// add scene to the stage
+        primaryStage.setScene(new Scene(root, 1300, 950));// add scene to the stage
         primaryStage.show();// make the stage visible
 
         map_controller map_controller = loader.getController();
 
-        List<Draw> elements = new ArrayList<>();
+        List<Draw> elements_roads = new ArrayList<>();
+        List<Draw> elements_stops = new ArrayList<>();
+        List<Draw> elements_vehicles = new ArrayList<>();
         List<Coordinate> streetCoor = new ArrayList<>();
         List<String> linepath = new ArrayList<>();
         BusLine busLine = null;
@@ -35,25 +38,20 @@ public class Main extends Application {
         List<Stop> arraystop = new ArrayList<>();
         JSONParser parser = new JSONParser();
         List<String> array_buslines_numbers = new ArrayList<>();
+        List<LocalTime> array_buslines_leave_times = new ArrayList<>();
+
 
         //each parsing needs new object
         Object obj = parser.parse(new FileReader("data/data.json"));
-        City_Map_Init(obj, arraystop, arraystreet, streetCoor, elements);
-        Traffic_Init(obj, arraypath, busLine, linepath, elements, arraystop, arraystreet, array_buslines_numbers);
-        System.out.println(elements.size());
-        map_controller.setElements(elements,array_buslines_numbers);
+        City_Map_Init(obj, arraystop, arraystreet, streetCoor, elements_roads, elements_stops);
+        Traffic_Init(obj, arraypath, busLine, linepath, elements_vehicles, arraystop, arraystreet, array_buslines_numbers, array_buslines_leave_times);
+        map_controller.setElements(elements_roads, elements_stops, elements_vehicles, array_buslines_numbers, array_buslines_leave_times);
         map_controller.startTime(1.0);
     }
 
-    /**
-     * Method parses and inicialises private variables with data taken in JSON format
-     * @param obj parsed data from file data.json
-     * @param stops_list list of stops for a street
-     * @param streets_list list of streets
-     * @param street_Coordinates coordinates of streets
-     * @param elements list of eleemnts to be drawn onto a screen
-     */
-    public void City_Map_Init(Object obj, List<Stop> stops_list,List<Street> streets_list,  List<Coordinate> street_Coordinates,List<Draw> elements ){
+
+    public void City_Map_Init(Object obj, List<Stop> stops_list,List<Street> streets_list, List<Coordinate> street_Coordinates,
+                              List<Draw> elements_roads, List<Draw> elements_stops ){
         JSONObject jsonObject = (JSONObject)obj; // conversion of object to jsonobject
 // Streets-------------------------------------------------------------------------------------------------------------------
         JSONArray ArrayStreets = (JSONArray) jsonObject.get("streets"); // streets from json stored into jsonarray
@@ -68,7 +66,7 @@ public class Main extends Application {
                 double street_y = Double.parseDouble((String) CoorObj.get("y")); //convert string of Y coordinate to double and store it
                 street_Coordinates.add(new Coordinate(street_x, street_y)); //adding coordinates into a list of coordinates street_Coordinates
             }
-            elements.add(new Street(name, street_Coordinates.get(0), street_Coordinates.get(1))); // add street to list of items to be drawn
+            elements_roads.add(new Street(name, street_Coordinates.get(0), street_Coordinates.get(1))); // add street to list of items to be drawn
             streets_list.add(new Street(name, street_Coordinates.get(0), street_Coordinates.get(1))); //add street to list of streets
             street_Coordinates.clear(); // clear the buffer
 //Stops----------------------------------------------------------------------------------------------------------------------
@@ -78,7 +76,7 @@ public class Main extends Application {
                 String stop_Name =(String) StopObj.get("nameStop");
                 double stop_x = Double.parseDouble((String) StopObj.get("x"));//convert coordinates into double
                 double stop_y = Double.parseDouble((String) StopObj.get("y"));
-                elements.add(new Stop(new Coordinate(stop_x,stop_y), stop_Name, name)); // add new stop into list of things to be drawn
+                elements_stops.add(new Stop(new Coordinate(stop_x,stop_y), stop_Name, name)); // add new stop into list of things to be drawn
                 stops_list.add(new Stop(new Coordinate(stop_x,stop_y), stop_Name, name));// add new stop into list of stops
             }
         }
@@ -89,15 +87,17 @@ public class Main extends Application {
      * @param path_Coord_list list of coordinates
      * @param bus_Route line that vehicles travels on
      * @param bus_Route_path list of string(names of stops)
-     * @param elements list of eleemnts to be drawn onto a screen
+     * @param elements_vehicles list of eleemnts to be drawn onto a screen
      * @param stops_list list of stops for a street
      * @param streets_list list of streets
      */
     public void Traffic_Init(Object obj, List<Coordinate> path_Coord_list, BusLine bus_Route, List<String> bus_Route_path,
-                             List<Draw> elements, List<Stop> stops_list, List<Street> streets_list, List<String> array_buslines_numbers ) {
+                             List<Draw> elements_vehicles, List<Stop> stops_list, List<Street> streets_list,
+                             List<String> array_buslines_numbers, List<LocalTime> transit_schedule ) {
 
         JSONObject jsonObjLINE = (JSONObject) obj;//store object into JSON Object
         JSONArray ArrayLine = (JSONArray) jsonObjLINE.get("line"); // create array from all instances of line from JSON
+        List<LocalTime> transit_schedule_one_busline = new ArrayList<>();
 
         for (int m = 0; m < ArrayLine.size(); m++) {// loop through all lines stored in an array ArrayLine
             JSONObject LineObj = (JSONObject) ArrayLine.get(m);//take one line at a time
@@ -108,19 +108,25 @@ public class Main extends Application {
             for (int n = 0; n < ArrayPath.size(); n++) { // loop through the array of stop names
                 bus_Route_path.add((String) ArrayPath.get(n)); // add it to another list of string containing stop names
             }
-            List<String> transit_schedule = new ArrayList<>();
-            for (int n = 0; n < transit_scheduled_leave.size(); n++) {
-                transit_schedule.add((String) transit_scheduled_leave.get(n));
+            for (int n = 0; n < transit_scheduled_leave.size(); n++) {//insert all times bus leave any station
+                String least_At= (String) transit_scheduled_leave.get(n);
+                int hours = Integer.parseInt(least_At.substring(0, 2));        // parsing of hh:mm:ss format
+                int minutes = Integer.parseInt(least_At.substring(3, 5));
+                int seconds = Integer.parseInt(least_At.substring(6, 8));
+                transit_schedule.add(LocalTime.of(hours, minutes, seconds));
+                transit_schedule_one_busline.add(LocalTime.of(hours, minutes, seconds));
             }
+
             bus_Route = new BusLine(bus_Route_Number, bus_Route_path); //instantiation of bus_Route
             path_Coord_list = bus_Route.getRealPath(stops_list, streets_list);
-            List<Stop> temp = bus_Route.getStops();
+            List<Stop> list_stops_bus_route = bus_Route.getStops();
             if(!array_buslines_numbers.contains(bus_Route_Number))//check if bus number is not already present
                     array_buslines_numbers.add(bus_Route_Number);//add if not
 
-            for(String schedule: transit_schedule){
-                elements.add(new Bus(bus_Route_Number, 55, new Path(path_Coord_list), schedule,temp ));//add a new bus on a road
+            for(LocalTime schedule: transit_schedule_one_busline){
+                elements_vehicles.add(new Bus(bus_Route_Number, 55, new Path(path_Coord_list), schedule, list_stops_bus_route ));//add a new bus on a road
             }
+            transit_schedule_one_busline.clear();
             bus_Route_path.clear();
         }
     }
