@@ -302,9 +302,9 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
         checkRestrictionLevel1();
         checkRestrictionLevel2();
 
-        System.out.println("Previous distance "+distance);
+        /*System.out.println("Previous distance "+distance);
         System.out.println("Speed + distance would be "+(distance+speed));
-
+*/
         if(start_restricted_streets_lvl_1.size() > 0 && lengths_of_restricted_streets_lvl_1.size() > 0) {
             restricted = start_restricted_streets_lvl_1.get(restricted_lvl_1_index);
             restricted_length = lengths_of_restricted_streets_lvl_1.get(restricted_lvl_1_index);
@@ -346,8 +346,8 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
             else distance += this.speed;
         }
         else distance += this.speed;
-        System.out.println("Returned distance "+distance);
-        System.out.println("----------------------------------------------------------------------------------");
+       /* System.out.println("Returned distance "+distance);
+        System.out.println("----------------------------------------------------------------------------------");*/
         return distance;
     }
     /**

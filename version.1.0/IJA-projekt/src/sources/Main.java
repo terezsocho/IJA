@@ -139,6 +139,7 @@ public class Main extends Application {
             path_Coord_list = bus_Route.getRealPath(stops_list, streets_list);
             List<Stop> list_stops_bus_route = bus_Route.getStops();
             List<Street> list_streets_bus_route = bus_Route.getStreets();
+
             for(LocalTime schedule: transit_schedule_one_busline){
                 array_buslines_numbers.add(bus_Route_Number);//intentionally contains duplicates
                 Bus instance_of_bus = new Bus(bus_Route_Number, new Path(path_Coord_list), schedule,
