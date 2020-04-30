@@ -56,6 +56,9 @@ public class map_controller {
     private List<Street> restriction_lvl_1 = new ArrayList<>();
     private List<Street> restriction_lvl_2 = new ArrayList<>();
 
+    /**
+     * Method stores values from choiceboxes to be later used in restriction policy for streets.
+     */
     @FXML
     private void onRoadRestrictionChange(){
         String chosen_street = choiceBox_street.getValue();

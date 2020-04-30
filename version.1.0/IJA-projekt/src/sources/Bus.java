@@ -16,7 +16,7 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
 
     private Coordinate position;
     private double distance = 0.0;
-    private double speed = 0.0;
+    private double speed;
     private Path path;
     private List<Shape> gui = new ArrayList<>();
     private String id;
@@ -51,8 +51,6 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
         gui.add(new Circle(path.getPathCoord().get(0).getX(), path.getPathCoord().get(0).getY(), 12, Color.RED));
         gui.add(new Text(path.getPathCoord().get(0).getX() - 3.5, path.getPathCoord().get(0).getY() + 4, id));//constants just for visual fixes
     }
-
-
 
     /**
      * Method returns identification information of a busline
@@ -166,26 +164,31 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
         return null;
     }
 
+    /**
+     * Method finds indexes of coordinates between whose traffic is slowed, due to the restriction policy of level 1.
+     * Additionally evaluates lengths between these coordinates and stores them for future use.
+     */
     public void checkRestrictionLevel1(){
         List<Integer> indexes_busLine_restr_lvl_1 = new ArrayList<>();
         boolean start_inserted = false, end_inserted = false;
         Coordinate start_coord_restr_street, end_coord_restr_street;
 
-        if(restriction_lvl_1.size() > 0) {
-            for(Street street: restriction_lvl_1) {
-                if (bus_line_streets.contains(street)) {
+        if(restriction_lvl_1.size() > 0) { // if list is not empty
+            for(Street street: restriction_lvl_1) { // for every street with level 1 restrictions
+                if (bus_line_streets.contains(street)) { // check if currently examined busline travels throught street
                     start_coord_restr_street = street.get_Start_coord();
                     end_coord_restr_street = street.get_End_coord();
-                } else continue;
+                } else continue;// if not skip rest of code
+
                 for (int i = 0; i < line_coordinates.size(); i++) {
-                    Coordinate temp_line_coord = line_coordinates.get(i);
+                    Coordinate temp_line_coord = line_coordinates.get(i);//examine each coordinate on a busline
                     if (temp_line_coord.equals(start_coord_restr_street)){
                         start_inserted = true;
-                        indexes_busLine_restr_lvl_1.add(i);
+                        indexes_busLine_restr_lvl_1.add(i); //insert index of coordinate from busline coordniate list
                     }
                     else if (temp_line_coord.equals(end_coord_restr_street)) {
                         end_inserted = true;
-                        indexes_busLine_restr_lvl_1.add(i);
+                        indexes_busLine_restr_lvl_1.add(i); //insert index of coordinate from busline coordniate list
                     }
                     if(end_inserted && start_inserted) break;//already both inserted
                 }
@@ -198,7 +201,6 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
             //sorting of a list for easier indexing
             indexes_busLine_restr_lvl_1 =  indexes_busLine_restr_lvl_1.stream().sorted().collect(Collectors.toList());
         }
-
 //Distance ----------------------------------------------------------------------------------------------------------
 
         start_restricted_streets_lvl_1.clear();
@@ -208,7 +210,7 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
             Coordinate temp2 = line_coordinates.get(indexes_busLine_restr_lvl_1.get(j));
             //calculates distance from start of restricted street to its end
             double temp_distance_restr = getDistance(temp1, temp2);
-            lengths_of_restricted_streets_lvl_1.add(temp_distance_restr);
+            lengths_of_restricted_streets_lvl_1.add(temp_distance_restr);//add calculated length to a list
 
             double temp_distance_until_restr = 0.0;
             //loop through the streets to calculate distance between start and next restricted street
@@ -219,24 +221,31 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
             }
             start_restricted_streets_lvl_1.add(temp_distance_until_restr);
         }
+        //sort lists from smallest to highest value
         start_restricted_streets_lvl_1 = start_restricted_streets_lvl_1.stream().sorted().collect(Collectors.toList());
         lengths_of_restricted_streets_lvl_1 = lengths_of_restricted_streets_lvl_1.stream().sorted().collect(Collectors.toList());
     }
 
+
+    /**
+     * Method finds indexes of coordinates between whose traffic is slowed, due to the restriction policy of level 2.
+     * Additionally evaluates lengths between these coordinates and stores them for future use.
+     */
     public void checkRestrictionLevel2(){
-        List<Integer> indexes_busLine_restr_lvl_2 = new ArrayList<>();
+        List<Integer> indexes_busLine_restr_lvl_2 = new ArrayList<>(); //create new list for level 2 restrictions
         boolean start_inserted = false, end_inserted = false;
         Coordinate start_coord_restr_street, end_coord_restr_street;
 
         if(restriction_lvl_2.size() > 0) {
-            for(Street street: restriction_lvl_2) {
+            for(Street street: restriction_lvl_2) { //loop through each street with levl 2 restriction policy
                 if (bus_line_streets.contains(street)) {
                     start_coord_restr_street = street.get_Start_coord();
                     end_coord_restr_street = street.get_End_coord();
-                } else continue;
+                } else continue;//if busline does not travel through the street skip rest of code
+
                 for (int i = 0; i < line_coordinates.size(); i++) {
                     Coordinate temp_line_coord = line_coordinates.get(i);
-                    if (temp_line_coord.equals(start_coord_restr_street)){
+                    if (temp_line_coord.equals(start_coord_restr_street)){ //check if cooordinate equals on of street's ones
                         start_inserted = true;
                         indexes_busLine_restr_lvl_2.add(i);
                     }
@@ -274,12 +283,20 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
             }
             start_restricted_streets_lvl_2.add(temp_distance_until_restr);
         }
+        //sort lists according to value froms smallest to highest
         start_restricted_streets_lvl_2 = start_restricted_streets_lvl_2.stream().sorted().collect(Collectors.toList());
         lengths_of_restricted_streets_lvl_2 = lengths_of_restricted_streets_lvl_2.stream().sorted().collect(Collectors.toList());
     }
 
+
+
     int restricted_lvl_1_index = 0;
     int restricted_lvl_2_index = 0;
+    /**
+     * Method calculates distance from previous position of a bus according to a restrictions on a current street.
+     * @param distance value of already travelled distance by a bus from its sorce bus stop
+     * @return new value of distance. This may be unaffected by restriction or may affected by 2 restricton groups.
+     */
     private double getNewPosition(double distance){
         double restricted, restricted_length;
         checkRestrictionLevel1();
