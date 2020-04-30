@@ -32,6 +32,7 @@ public class BusLine {
     public List<Street> getStreets(){
         return temp_array_street;
     }
+
     /**
      * Method creates final list of all Coordinates that bus must pass on its route. All stops it needs to make such as
      * intersectons or bus stops.
@@ -57,13 +58,24 @@ public class BusLine {
 //*******************************************************************************************
         street = temp_array_street.get(0); // assign first street too variable street
         for (int i = 0; i < path.size(); i++) {
-
             if ((i == 0)) {//if first
                 realpath.add(temp_array_stops.get(i).getCoordinates());//add to the list of coordinates realpath coordinates of that stop
-            } else {
+            }
+            else {
+
                 if (temp_array_stops.get(i).getOn_street().equals(streetname)) {//if street that stop is mounted on is equal to the streetname, so stop is on the same street as previous
                     realpath.add(temp_array_stops.get(i).getCoordinates());//add it to the list of coordinates realpath
                 } else {
+
+                    if(getDistance(street.get_Start_coord(),temp_array_street.get(i).get_Start_coord()) <= 0.0005)
+                        realpath.add(street.get_Start_coord());//if yes add this starting coordinate into a realpath
+                    else if(getDistance(street.get_Start_coord(),temp_array_street.get(i).get_End_coord()) <= 0.0005)
+                        realpath.add(street.get_Start_coord());
+                    else if(getDistance(street.get_End_coord(),temp_array_street.get(i).get_Start_coord()) <= 0.0005)
+                        realpath.add(street.get_End_coord());
+                    else if(getDistance(street.get_End_coord(),temp_array_street.get(i).get_End_coord()) <= 0.0005)
+                        realpath.add(street.get_End_coord());
+/*
                     if (street.get_Start_coord().equals(temp_array_street.get(i).get_Start_coord())) {//check if streets have same starting coordinates
                         realpath.add(street.get_Start_coord());//if yes add this starting coordinate into a realpath
                     } else if (street.get_Start_coord().equals(temp_array_street.get(i).get_End_coord())) {
@@ -72,7 +84,7 @@ public class BusLine {
                         realpath.add(street.get_End_coord());
                     } else if(street.get_End_coord().equals(temp_array_street.get(i).get_Start_coord())){
                         realpath.add(street.get_End_coord());
-                    }
+                    }*/
                     realpath.add(temp_array_stops.get(i).getCoordinates());
                 }
             }
@@ -80,5 +92,14 @@ public class BusLine {
             street = temp_array_street.get(i);
         }
         return realpath;
+    }
+    /**
+     * Method calculates distance needed for travel between two specified coordinates in meters.
+     * @param a Coordinate of starting position for calculation of distance
+     * @param b Coordinate of end position for calculation of distance
+     * @return Double value of distance to travel between two coordinates
+     */
+    private double getDistance(Coordinate a, Coordinate b) {
+        return Math.sqrt(Math.pow(a.getX() - b.getX(), 2) + Math.pow(a.getY() - b.getY(), 2));
     }
 }
