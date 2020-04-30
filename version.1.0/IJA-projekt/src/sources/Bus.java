@@ -10,6 +10,7 @@ import javafx.scene.text.Text;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Bus implements Draw, TimeUpdate, LineInfo {
 
@@ -20,8 +21,16 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
     private List<Shape> gui = new ArrayList<>();
     private String id;
     private List<Coordinate> line_coordinates;
-    private List<Stop> bus_line_stops;
+    private List<Stop> bus_line_stops;  //does not need to ne initialized, constructor does that
+    private List<Street> bus_line_streets; //does not need to ne initialized, constructor does that
     private LocalTime least_At;
+    private List<Street> restriction_lvl_1 = new ArrayList<>();
+    private List<Street> restriction_lvl_2 = new ArrayList<>();
+    private List<Double> lengths_of_restricted_streets_lvl_1 = new ArrayList<>(); // contains lengths of restricted road
+    private List<Double> start_restricted_streets_lvl_1 = new ArrayList<>(); // contains starting positions of restricting roads
+    private List<Double> lengths_of_restricted_streets_lvl_2 = new ArrayList<>(); // contains lengths of restricted road
+    private List<Double> start_restricted_streets_lvl_2 = new ArrayList<>(); // contains starting positions of restricting roads
+
 
     /**
      * Constructor for Bus elements.
@@ -30,26 +39,20 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
      * @param least_At List of LocalTimes that showcase departure times of all buses on busline from their first stop
      * @param bus_line_stops List of Stops on a bus route
      */
-    public Bus(String id,  Path path, LocalTime least_At, List<Stop> bus_line_stops) {
+    public Bus(String id,  Path path, LocalTime least_At, List<Stop> bus_line_stops,List<Street> bus_line_streets, double speed) {
         this.line_coordinates = path.getPathCoord();
         this.position = path.getPathCoord().get(0);
         this.bus_line_stops = bus_line_stops;
+        this.bus_line_streets = bus_line_streets;
         this.path = path;
         this.id = id;
         this.least_At = least_At;
+        this.speed = speed / 3.6;//convert speed to metres per sec
         gui.add(new Circle(path.getPathCoord().get(0).getX(), path.getPathCoord().get(0).getY(), 12, Color.RED));
         gui.add(new Text(path.getPathCoord().get(0).getX() - 3.5, path.getPathCoord().get(0).getY() + 4, id));//constants just for visual fixes
     }
 
-    /**
-     * Method calculates distance needed for travel between two specified coordinates in meters.
-     * @param a Coordinate of starting position for calculation of distance
-     * @param b Coordinate of end position for calculation of distance
-     * @return Double value of distance to travel between two coordinates
-     */
-    private double getDistance(Coordinate a, Coordinate b) {
-        return Math.sqrt(Math.pow(a.getX() - b.getX(), 2) + Math.pow(a.getY() - b.getY(), 2));
-    }
+
 
     /**
      * Method returns identification information of a busline
@@ -72,11 +75,16 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
      * @param coordinate Coordinate of next position that bus should be moved to
      */
     private void moveGUI(Coordinate coordinate) {
+        //System.out.println("MOVEGUI distance "+distance);
+        //System.out.println("Restriction level1: "+restriction_lvl_1);
+       // System.out.println("Streets on route: "+bus_line_streets);
         for (Shape shape : gui) {
             shape.setVisible(true);
             if (waiting_at_bus_stop == false) { // if bus is currently not at bus stop continue
                 //distance needs to be less than the speed that bus makes in 1 step..
-                if (getDistance(position, line_coordinates.get(index)) < speed && behind_bus_stop == false) {
+                double distance_to_next_postition = getDistance(position, line_coordinates.get(index));
+
+                if (distance_to_next_postition < speed && behind_bus_stop == false) {
                     shape.setTranslateX((line_coordinates.get(index).getX() - position.getX()) + shape.getTranslateX());
                     shape.setTranslateY((line_coordinates.get(index).getY() - position.getY()) + shape.getTranslateY());
                     //shape.toFront();
@@ -128,18 +136,18 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
     }
 
     boolean set_immutable_bus_stop = true;
-
     /**
      * Method updates positions of a bus on a canvas to its next position
      * @param time LocalTime variable used to determine if bus is up for departure
      * @return Coordinate of current bus position.
      */
     @Override
-    public Coordinate update(LocalTime time, double speed) {
-        this.speed = speed / 3.6;//convert speed to metres per sec
+    public Coordinate update(LocalTime time, List<Street> restriction_lvl_1, List<Street> restriction_lvl_2) {
+        this.restriction_lvl_1 = restriction_lvl_1;
+        this.restriction_lvl_2 = restriction_lvl_2;
+
         if (time.isAfter(least_At)) {
-            //System.out.println("Time is: " + time);
-            distance = distance + this.speed;
+             distance = getNewPosition(distance);
             if (distance > path.getPathSize()) {
                 // only moves it to final destination once, if repeated moveGUi still moves it by small margin
                 if (set_immutable_bus_stop == true) {
@@ -158,6 +166,182 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
         return null;
     }
 
+    public void checkRestrictionLevel1(){
+        List<Integer> indexes_busLine_restr_lvl_1 = new ArrayList<>();
+        boolean start_inserted = false, end_inserted = false;
+        Coordinate start_coord_restr_street, end_coord_restr_street;
+
+        if(restriction_lvl_1.size() > 0) {
+            for(Street street: restriction_lvl_1) {
+                if (bus_line_streets.contains(street)) {
+                    start_coord_restr_street = street.get_Start_coord();
+                    end_coord_restr_street = street.get_End_coord();
+                } else continue;
+                for (int i = 0; i < line_coordinates.size(); i++) {
+                    Coordinate temp_line_coord = line_coordinates.get(i);
+                    if (temp_line_coord.equals(start_coord_restr_street)){
+                        start_inserted = true;
+                        indexes_busLine_restr_lvl_1.add(i);
+                    }
+                    else if (temp_line_coord.equals(end_coord_restr_street)) {
+                        end_inserted = true;
+                        indexes_busLine_restr_lvl_1.add(i);
+                    }
+                    if(end_inserted && start_inserted) break;//already both inserted
+                }
+                end_inserted = false;
+                start_inserted = false;
+            }
+            //if number of indexes is odd then add 0 to beginning because route started in the middle of a street
+            if(indexes_busLine_restr_lvl_1.size() % 2 == 1) indexes_busLine_restr_lvl_1.add(0,0);
+
+            //sorting of a list for easier indexing
+            indexes_busLine_restr_lvl_1 =  indexes_busLine_restr_lvl_1.stream().sorted().collect(Collectors.toList());
+        }
+
+//Distance ----------------------------------------------------------------------------------------------------------
+
+        start_restricted_streets_lvl_1.clear();
+        lengths_of_restricted_streets_lvl_1.clear();
+        for (int j = 1; j < indexes_busLine_restr_lvl_1.size() ; j+=2) { //increments by two
+            Coordinate temp1 = line_coordinates.get(indexes_busLine_restr_lvl_1.get(j-1));
+            Coordinate temp2 = line_coordinates.get(indexes_busLine_restr_lvl_1.get(j));
+            //calculates distance from start of restricted street to its end
+            double temp_distance_restr = getDistance(temp1, temp2);
+            lengths_of_restricted_streets_lvl_1.add(temp_distance_restr);
+
+            double temp_distance_until_restr = 0.0;
+            //loop through the streets to calculate distance between start and next restricted street
+            for (int i = 0; i < indexes_busLine_restr_lvl_1.get(j-1); i++) {
+                temp1 = line_coordinates.get(i);
+                temp2 = line_coordinates.get(i+1);
+                temp_distance_until_restr += getDistance(temp1, temp2);
+            }
+            start_restricted_streets_lvl_1.add(temp_distance_until_restr);
+        }
+        start_restricted_streets_lvl_1 = start_restricted_streets_lvl_1.stream().sorted().collect(Collectors.toList());
+        lengths_of_restricted_streets_lvl_1 = lengths_of_restricted_streets_lvl_1.stream().sorted().collect(Collectors.toList());
+    }
+
+    public void checkRestrictionLevel2(){
+        List<Integer> indexes_busLine_restr_lvl_2 = new ArrayList<>();
+        boolean start_inserted = false, end_inserted = false;
+        Coordinate start_coord_restr_street, end_coord_restr_street;
+
+        if(restriction_lvl_2.size() > 0) {
+            for(Street street: restriction_lvl_2) {
+                if (bus_line_streets.contains(street)) {
+                    start_coord_restr_street = street.get_Start_coord();
+                    end_coord_restr_street = street.get_End_coord();
+                } else continue;
+                for (int i = 0; i < line_coordinates.size(); i++) {
+                    Coordinate temp_line_coord = line_coordinates.get(i);
+                    if (temp_line_coord.equals(start_coord_restr_street)){
+                        start_inserted = true;
+                        indexes_busLine_restr_lvl_2.add(i);
+                    }
+                    else if (temp_line_coord.equals(end_coord_restr_street)) {
+                        end_inserted = true;
+                        indexes_busLine_restr_lvl_2.add(i);
+                    }
+                    if(end_inserted && start_inserted) break;//already both inserted
+                }
+                end_inserted = false;
+                start_inserted = false;
+            }
+            //if number of indexes is odd then add 0 to beginning because route started in the middle of a street
+            if(indexes_busLine_restr_lvl_2.size() % 2 == 1) indexes_busLine_restr_lvl_2.add(0,0);
+
+            //sorting of a list for easier indexing
+            indexes_busLine_restr_lvl_2 =  indexes_busLine_restr_lvl_2.stream().sorted().collect(Collectors.toList());
+        }
+//Distance ----------------------------------------------------------------------------------------------------------
+        start_restricted_streets_lvl_2.clear();
+        lengths_of_restricted_streets_lvl_2.clear();
+        for (int j = 1; j < indexes_busLine_restr_lvl_2.size() ; j+=2) { //increments by two
+            Coordinate temp1 = line_coordinates.get(indexes_busLine_restr_lvl_2.get(j-1));
+            Coordinate temp2 = line_coordinates.get(indexes_busLine_restr_lvl_2.get(j));
+            //calculates distance from start of restricted street to its end
+            double temp_distance_restr = getDistance(temp1, temp2);
+            lengths_of_restricted_streets_lvl_2.add(temp_distance_restr);
+
+            double temp_distance_until_restr = 0.0;
+            //loop through the streets to calculate distance between start and next restricted street
+            for (int i = 0; i < indexes_busLine_restr_lvl_2.get(j-1); i++) {
+                temp1 = line_coordinates.get(i);
+                temp2 = line_coordinates.get(i+1);
+                temp_distance_until_restr += getDistance(temp1, temp2);
+            }
+            start_restricted_streets_lvl_2.add(temp_distance_until_restr);
+        }
+        start_restricted_streets_lvl_2 = start_restricted_streets_lvl_2.stream().sorted().collect(Collectors.toList());
+        lengths_of_restricted_streets_lvl_2 = lengths_of_restricted_streets_lvl_2.stream().sorted().collect(Collectors.toList());
+    }
+
+    int restricted_lvl_1_index = 0;
+    int restricted_lvl_2_index = 0;
+    private double getNewPosition(double distance){
+        double restricted, restricted_length;
+        checkRestrictionLevel1();
+        checkRestrictionLevel2();
+
+        System.out.println("Previous distance "+distance);
+        System.out.println("Speed + distance would be "+(distance+speed));
+
+        if(start_restricted_streets_lvl_1.size() > 0 && lengths_of_restricted_streets_lvl_1.size() > 0) {
+            restricted = start_restricted_streets_lvl_1.get(restricted_lvl_1_index);
+            restricted_length = lengths_of_restricted_streets_lvl_1.get(restricted_lvl_1_index);
+            if (distance >= restricted) {
+                if (distance < (restricted + restricted_length)) {
+                    distance += this.speed / 2;
+                }
+                else{
+                    if(index < lengths_of_restricted_streets_lvl_1.size()) index++;//index can not exceed length-1
+
+                    restricted = start_restricted_streets_lvl_1.get(restricted_lvl_1_index);//assign new values from list
+                    restricted_length = lengths_of_restricted_streets_lvl_1.get(restricted_lvl_1_index);
+                    if (distance < (restricted + restricted_length)) {//check again if next street is also restricted
+                        distance += this.speed / 2;
+                    }
+                    else distance += this.speed;
+                }
+            }
+            else distance += this.speed;
+        }
+        else if(start_restricted_streets_lvl_2.size() > 0 && lengths_of_restricted_streets_lvl_2.size() > 0) {
+            restricted = start_restricted_streets_lvl_2.get(restricted_lvl_2_index);
+            restricted_length = lengths_of_restricted_streets_lvl_2.get(restricted_lvl_2_index);
+            if (distance >= restricted) {
+                if (distance < (restricted + restricted_length)) {
+                    distance += this.speed / 3;
+                }
+                else{
+                    if(index < lengths_of_restricted_streets_lvl_2.size()) index++;//index can not exceed length-1
+
+                    restricted = start_restricted_streets_lvl_2.get(restricted_lvl_2_index);//assign new values from list
+                    restricted_length = lengths_of_restricted_streets_lvl_2.get(restricted_lvl_2_index);
+                    if (distance < (restricted + restricted_length)) {//check again if next street is also restricted
+                        distance += this.speed / 3;
+                    }
+                    else distance += this.speed;
+                }
+            }
+            else distance += this.speed;
+        }
+        else distance += this.speed;
+        System.out.println("Returned distance "+distance);
+        System.out.println("----------------------------------------------------------------------------------");
+        return distance;
+    }
+    /**
+     * Method calculates distance needed for travel between two specified coordinates in meters.
+     * @param a Coordinate of starting position for calculation of distance
+     * @param b Coordinate of end position for calculation of distance
+     * @return Double value of distance to travel between two coordinates
+     */
+    private double getDistance(Coordinate a, Coordinate b) {
+        return Math.sqrt(Math.pow(a.getX() - b.getX(), 2) + Math.pow(a.getY() - b.getY(), 2));
+    }
     /**
      * Method returns busline coordinates for each bus on this route to be passed.
      * @return List of Coordinates

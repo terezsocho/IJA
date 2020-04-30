@@ -26,6 +26,13 @@ public class BusLine {
     }
 
     /**
+     * Method returns all streets for a specific busline on its route
+     * @return List of Stops
+     */
+    public List<Street> getStreets(){
+        return temp_array_street;
+    }
+    /**
      * Method creates final list of all Coordinates that bus must pass on its route. All stops it needs to make such as
      * intersectons or bus stops.
      * @param arraystop List of all Stops in a simulation

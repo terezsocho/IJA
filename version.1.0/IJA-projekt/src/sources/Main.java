@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Main extends Application {
+    public static int NORMAL_BUS_SPEED = 55;
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../Resources/public_transit.fxml"));
@@ -44,7 +46,9 @@ public class Main extends Application {
         //each parsing needs new object
         Object obj = parser.parse(new FileReader("data/data.json"));
         City_Map_Init(obj, arraystop, arraystreet, streetCoor, elements_roads, elements_stops);
-        Traffic_Init(obj, arraypath, busLine, linepath, elements_vehicles, arraystop, arraystreet, array_buslines_numbers, array_buslines_leave_times);
+        Traffic_Init(obj, arraypath, busLine, linepath, elements_vehicles, arraystop, arraystreet,
+                array_buslines_numbers, array_buslines_leave_times);
+
         System.out.println("Size of buslines"+array_buslines_numbers.size());
 
         map_controller.setElements(elements_roads, elements_stops, elements_vehicles, array_buslines_numbers,
@@ -134,9 +138,12 @@ public class Main extends Application {
             bus_Route = new BusLine(bus_Route_Number, bus_Route_path); //instantiation of bus_Route
             path_Coord_list = bus_Route.getRealPath(stops_list, streets_list);
             List<Stop> list_stops_bus_route = bus_Route.getStops();
+            List<Street> list_streets_bus_route = bus_Route.getStreets();
             for(LocalTime schedule: transit_schedule_one_busline){
                 array_buslines_numbers.add(bus_Route_Number);//intentionally contains duplicates
-                elements_vehicles.add(new Bus(bus_Route_Number,  new Path(path_Coord_list), schedule, list_stops_bus_route ));//add a new bus on a road
+                Bus instance_of_bus = new Bus(bus_Route_Number, new Path(path_Coord_list), schedule,
+                                                list_stops_bus_route, list_streets_bus_route, NORMAL_BUS_SPEED);
+                elements_vehicles.add(instance_of_bus);//add a new bus on a road
             }
             transit_schedule_one_busline.clear();
             bus_Route_path.clear();

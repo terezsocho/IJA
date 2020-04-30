@@ -81,8 +81,8 @@ public class map_controller {
                     if(restriction_lvl_2.contains(street)) //check if it is not already in different list if so delete
                         restriction_lvl_2.remove(street);
                 }
-                System.out.println("LVL1 "+ restriction_lvl_1);
-                System.out.println("LVL2 "+ restriction_lvl_2);
+                //System.out.println("LVL1 "+ restriction_lvl_1);
+                //System.out.println("LVL2 "+ restriction_lvl_2);
             }
         }
 
@@ -180,17 +180,15 @@ public class map_controller {
                     //for (TimeUpdate update : updates) {
                 for (int index = 0; index<updates.size()-1; index++) {
                     //set current position of bus using timertask
-                    buses_current_positions.set(index, updates.get(index).update(time, NORMAL_BUS_SPEED));
+                    TimeUpdate update_bus_temp = updates.get(index);
+                    Coordinate bus_pos_temp = update_bus_temp.update(time, restriction_lvl_1, restriction_lvl_2);
+                    buses_current_positions.set(index, bus_pos_temp);
                     map_box.layout();
                 }
             }
         }, 0,(long) (1000/scale));//period establishes duration between updates
     }
 
-    public void test_coordinates_for_restrictions(List<Coordinate> temp_path){
-        System.out.println(temp_path);
-        System.out.println();
-    }
     /**
      * Method gather user input from mouse click and highlights specific busline.
      * @param mouse_clicked MouseEvent variable used in further checks to determine position of click on canvas
@@ -290,7 +288,7 @@ public class map_controller {
                 //System.out.println("Bus has not left the station yet.");
                 continue;
             }
-            //distance between ceenter of bus symbol and click coordinates
+            //distance between center of bus symbol and click coordinates
             double distance = Math.sqrt(Math.pow(clickedX - current_bus_position.getX(), 2)
                             + Math.pow(clickedY - current_bus_position.getY(), 2));
             if (distance <= 9) {//constant value 9 was estimated to produce best results, simulates radius of bus symbol
@@ -352,7 +350,7 @@ public class map_controller {
             double temp_distance = getDelayAtNextStop(current_bus_position,temp_path.get(stops_index_at.get(p)));
             if(temp_distance < delay_from_closest){
                 temp_index = p;//assign index of closest stop when clicked
-                break;
+                delay_from_closest = temp_distance;
             }
         }
         return temp_index;
