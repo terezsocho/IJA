@@ -3,6 +3,7 @@ package sources;
 import Controllers.map_controller;
 import Interfaces.Draw;
 import javafx.application.Application;
+import javafx.event.EventType;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -24,7 +25,7 @@ public class Main extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../Resources/public_transit.fxml"));
         Parent root = loader.load();// the root of the scene shown in the main window
         primaryStage.setTitle("Application of public transport");
-        primaryStage.setScene(new Scene(root, 1300, 950));// add scene to the stage
+        primaryStage.setScene(new Scene(root, 1350, 860));// add scene to the stage
         primaryStage.show();// make the stage visible
 
         map_controller map_controller = loader.getController();
@@ -49,11 +50,11 @@ public class Main extends Application {
         Traffic_Init(obj, arraypath, busLine, linepath, elements_vehicles, arraystop, arraystreet,
                 array_buslines_numbers, array_buslines_leave_times);
 
-        System.out.println("Size of buslines"+array_buslines_numbers.size());
 
         map_controller.setElements(elements_roads, elements_stops, elements_vehicles, array_buslines_numbers,
                                     array_buslines_leave_times, arraystreet );
-        map_controller.startTime(1.0);
+        map_controller.startTime(1);
+
     }
 
     /**

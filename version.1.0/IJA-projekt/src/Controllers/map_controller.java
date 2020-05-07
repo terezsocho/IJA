@@ -3,28 +3,46 @@ package Controllers;
 import Interfaces.Draw;
 import Interfaces.LineInfo;
 import Interfaces.TimeUpdate;
+import com.sun.scenario.animation.AbstractMasterTimer;
+import javafx.animation.AnimationTimer;
+import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventTarget;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 import sources.Coordinate;
 import sources.Stop;
 import sources.Street;
 
+import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class map_controller {
+    @FXML
+    private BorderPane rootPane;
     @FXML
     private Pane map_box = null;
     @FXML
@@ -36,6 +54,8 @@ public class map_controller {
     private ChoiceBox<String> choiceBox_street = new ChoiceBox<>();
     @FXML
     private ChoiceBox<String> choiceBox_level = new ChoiceBox<>();
+    @FXML
+    private ChoiceBox<String> closeStreet = new ChoiceBox<>();
 
     public static int NORMAL_BUS_SPEED = 55;
 
@@ -44,7 +64,6 @@ public class map_controller {
     private List<Draw> elements_roads = new ArrayList<>();
     private List<Draw> elements_stops = new ArrayList<>();
     private List<Draw> elements_vehicles = new ArrayList<>();
-    private Timer timer = null;
     private List<String> array_buslines_numbers;
     private LocalTime time = LocalTime.of(10,43,14); //inicializes to a same time
     private List<Coordinate> buses_current_positions = new ArrayList<>();
@@ -55,6 +74,7 @@ public class map_controller {
 
     private List<Street> restriction_lvl_1 = new ArrayList<>();
     private List<Street> restriction_lvl_2 = new ArrayList<>();
+    private String ClosedStreet;
 
     /**
      * Method stores values from choiceboxes to be later used in restriction policy for streets.
@@ -109,6 +129,9 @@ public class map_controller {
     /**
      * Method scales time. Using the value from Input text field.
      * If wrong format of data is inserted method informs user about it.
+     * 0 > data < 1 - acceleration
+     *  data > 1 - deceleration
+     *  data = 0 - stops movement
      */
     @FXML
     private void onTimeScaleChange(){
@@ -125,8 +148,25 @@ public class map_controller {
             Alert wrong_input = new Alert(Alert.AlertType.WARNING,"Text that was inputed is invalid.");
             wrong_input.show();
         }
-        timer.cancel();//stop previous timer
+        animationTimer.stop();
         startTime(scale);//initiate new timer
+    }
+
+    @FXML
+    private void OnCloseStreet(ActionEvent event) throws IOException {
+        ClosedStreet = closeStreet.getValue();
+        for(Street street : streets_list){
+            if (ClosedStreet == street.getId()){
+                Line red_line = new Line(street.get_Start_coord().getX(), street.get_Start_coord().getY(),
+                        street.get_End_coord().getX(), street.get_End_coord().getY());
+                red_line.setStroke(Color.GREY);
+                red_line.setStrokeWidth(5.0);//set it thicker than before
+                map_box.getChildren().add(red_line);//add it to scene over previously set values
+            }
+        }
+        // uzavreta Septimova
+        // obchadzka cez Einsteinovu a Radarovu
+
     }
 
     /**
@@ -168,28 +208,38 @@ public class map_controller {
         initChoiceBox();//populates choice boxes
     }
 
+    private AnimationTimer animationTimer;
+
+
     /**
      * Method creates timertask to be repeated every second to simulate movement of buses.
      * @param scale Double value used during fastening of the simulation
      */
-    public void startTime(double scale){
-        timer = new Timer(false);
+    public void startTime(double scale) {
 
-        timer.scheduleAtFixedRate(new TimerTask() {//new timertask
-            @Override
-            public void run() {
-                time = time.plusSeconds(1); // increase time every seconds with a second
-                System.out.println("Time is: " + time);
-                    //for (TimeUpdate update : updates) {
-                for (int index = 0; index<updates.size()-1; index++) {
-                    //set current position of bus using timertask
-                    TimeUpdate update_bus_temp = updates.get(index);
-                    Coordinate bus_pos_temp = update_bus_temp.update(time, restriction_lvl_1, restriction_lvl_2);
-                    buses_current_positions.set(index, bus_pos_temp);
-                    map_box.layout();
+
+
+        animationTimer = new AnimationTimer() {
+            int frameCount = 0;
+            public void handle(long l) {
+                if(frameCount == Math.round(scale*60) ) {
+                    time = time.plusSeconds(1) ;
+                    for (int index=0; index < updates.size(); index++) {
+                        Coordinate bus_pos_temp = updates.get(index).update(time, restriction_lvl_1, restriction_lvl_2, ClosedStreet);
+                        buses_current_positions.set(index, bus_pos_temp);
+                        map_box.layout();
+                    }
+                    frameCount = 0;
                 }
+                frameCount++;
             }
-        }, 0,(long) (1000/scale));//period establishes duration between updates
+        };
+
+        animationTimer.start();
+
+
+
+
     }
 
     /**
@@ -390,6 +440,9 @@ public class map_controller {
         }
         choiceBox_street.getItems().addAll(temp_street_names_list);
         choiceBox_street.setValue(temp_street_names_list.get(0));
+
+        closeStreet.getItems().addAll(temp_street_names_list);
+        closeStreet.setValue(temp_street_names_list.get(0));
 
         choiceBox_level.getItems().add("0");
         choiceBox_level.getItems().add("1");

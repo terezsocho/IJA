@@ -3,10 +3,19 @@ package sources;
 import Interfaces.Draw;
 import Interfaces.LineInfo;
 import Interfaces.TimeUpdate;
+import javafx.animation.AnimationTimer;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.Button;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
+
+import java.security.cert.X509Certificate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +32,11 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
     private List<Coordinate> line_coordinates;
     private List<Stop> bus_line_stops;  //does not need to ne initialized, constructor does that
     private List<Street> bus_line_streets; //does not need to ne initialized, constructor does that
+    private List<Street> alternative_bus_line  = new ArrayList<>();
     private LocalTime least_At;
     private List<Street> restriction_lvl_1 = new ArrayList<>();
     private List<Street> restriction_lvl_2 = new ArrayList<>();
+    private String closedStreet;
     private List<Double> lengths_of_restricted_streets_lvl_1 = new ArrayList<>(); // contains lengths of restricted road
     private List<Double> start_restricted_streets_lvl_1 = new ArrayList<>(); // contains starting positions of restricting roads
     private List<Double> lengths_of_restricted_streets_lvl_2 = new ArrayList<>(); // contains lengths of restricted road
@@ -50,7 +61,10 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
         this.speed = speed / 3.6;//convert speed to metres per sec
         gui.add(new Circle(path.getPathCoord().get(0).getX(), path.getPathCoord().get(0).getY(), 12, Color.RED));
         gui.add(new Text(path.getPathCoord().get(0).getX() - 3.5, path.getPathCoord().get(0).getY() + 4, id));//constants just for visual fixes
+
+
     }
+
 
     /**
      * Method returns identification information of a busline
@@ -76,8 +90,17 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
         //System.out.println("MOVEGUI distance "+distance);
         //System.out.println("Restriction level1: "+restriction_lvl_1);
        // System.out.println("Streets on route: "+bus_line_streets);
+
         for (Shape shape : gui) {
-            shape.setVisible(true);
+            try {
+                shape.setVisible(true);
+            } catch (Exception e) {
+                System.out.println(shape);
+                System.out.println(shape.isVisible());
+            } finally {
+                shape.setVisible(true);
+            }
+
             if (waiting_at_bus_stop == false) { // if bus is currently not at bus stop continue
                 //distance needs to be less than the speed that bus makes in 1 step..
                 double distance_to_next_postition = getDistance(position, line_coordinates.get(index));
@@ -91,13 +114,16 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
                         behind_bus_stop = true;//set true so next calculation is not according to old bus stop
                         this.position = line_coordinates.get(index);//set new position at a bus stop or intersection
                         waiting_at_bus_stop = true;
-                        //increment to check value againt next intersection or bus stop, until i
+                        //increment to check value against next intersection or bus stop, until i
                         if (line_coordinates.size() - 1 > index) index++;
 
                     }
                 } else {
-                    shape.setTranslateX((coordinate.getX() - position.getX()) + shape.getTranslateX());
-                    shape.setTranslateY((coordinate.getY() - position.getY()) + shape.getTranslateY());
+                    //System.out.println("coor: " + coordinate);
+                    //System.out.println("pos: " + position);
+                        shape.setTranslateX((coordinate.getX() - position.getX()) + shape.getTranslateX());
+                        shape.setTranslateY((coordinate.getY() - position.getY()) + shape.getTranslateY());
+
                     text_and_bus_passed++;
                     if (text_and_bus_passed % 2 == 0) {//there are 2 elements in gui, text and circle.. both need to go together
                         this.position = coordinate; // set new position as position + speed
@@ -140,11 +166,28 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
      * @return Coordinate of current bus position.
      */
     @Override
-    public Coordinate update(LocalTime time, List<Street> restriction_lvl_1, List<Street> restriction_lvl_2) {
+    public Coordinate update(LocalTime time, List<Street> restriction_lvl_1, List<Street> restriction_lvl_2, String closedStreet) {
         this.restriction_lvl_1 = restriction_lvl_1;
         this.restriction_lvl_2 = restriction_lvl_2;
 
-        if (time.isAfter(least_At)) {
+        //terez kod
+        this.closedStreet = closedStreet;
+        System.out.println("closedStreet:" +this.closedStreet);
+        for (Street closed: bus_line_streets){
+            System.out.print(closed.getId());
+            if(closed.getId() == this.closedStreet){
+                System.out.println("nothing");
+                //Street temp_street = closed;
+                //bus_line_streets.remove(temp_street);
+            }
+            else{
+                alternative_bus_line.add(closed);
+            }
+        }
+
+        //terez kod
+
+        if (time.isAfter(least_At)) {// if bus started its route
              distance = getNewPosition(distance);
             if (distance > path.getPathSize()) {
                 // only moves it to final destination once, if repeated moveGUi still moves it by small margin
