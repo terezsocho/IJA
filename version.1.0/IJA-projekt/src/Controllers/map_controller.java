@@ -434,8 +434,7 @@ public class map_controller {
             temp_street_names_list.add(street.getId());
         }
         choiceBox_street.getItems().addAll(temp_street_names_list);
-        //choiceBox_street.setValue(temp_street_names_list.get(0));
-        choiceBox_street.setValue(temp_street_names_list.get(2));
+        choiceBox_street.setValue(temp_street_names_list.get(0));
 
         closeStreet.getItems().addAll(temp_street_names_list);
         closeStreet.setValue(temp_street_names_list.get(0));
@@ -443,6 +442,6 @@ public class map_controller {
         choiceBox_level.getItems().add("0");
         choiceBox_level.getItems().add("1");
         choiceBox_level.getItems().add("2");
-        choiceBox_level.setValue("1");
+        choiceBox_level.setValue("0");
     }
 }
