@@ -7,21 +7,27 @@ import javafx.event.EventType;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.io.FileReader;
+import java.io.IOException;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Main extends Application {
     public static int NORMAL_BUS_SPEED = 55;
+    private static Stage primaryStage;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        this.primaryStage = primaryStage;
+
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../Resources/public_transit.fxml"));
         Parent root = loader.load();// the root of the scene shown in the main window
         primaryStage.setTitle("Application of public transport");
@@ -55,6 +61,20 @@ public class Main extends Application {
                                     array_buslines_leave_times, arraystreet );
         map_controller.startTime(1);
 
+    }
+
+    public static void ShowNewStage() throws IOException {
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(Main.class.getResource("../Resources/alternative_road.fxml"));
+        BorderPane closeStreet = loader.load();
+
+        Stage addAlternativeStage = new Stage();
+        addAlternativeStage.setTitle("Choose Alternative Road");
+        addAlternativeStage.initModality(Modality.WINDOW_MODAL);
+        addAlternativeStage.initOwner(primaryStage);
+        Scene scene = new Scene(closeStreet);
+        addAlternativeStage.setScene(scene);
+        addAlternativeStage.showAndWait();
     }
 
     /**

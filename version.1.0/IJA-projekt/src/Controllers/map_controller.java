@@ -27,6 +27,7 @@ import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import sources.Coordinate;
+import sources.Main;
 import sources.Stop;
 import sources.Street;
 
@@ -75,6 +76,8 @@ public class map_controller {
     private List<Street> restriction_lvl_1 = new ArrayList<>();
     private List<Street> restriction_lvl_2 = new ArrayList<>();
     private String ClosedStreet;
+    private Main main;
+
 
     /**
      * Method stores values from choiceboxes to be later used in restriction policy for streets.
@@ -154,7 +157,7 @@ public class map_controller {
 
     @FXML
     private void OnCloseStreet(ActionEvent event) throws IOException {
-        ClosedStreet = closeStreet.getValue();
+        /*ClosedStreet = closeStreet.getValue();
         for(Street street : streets_list){
             if (ClosedStreet == street.getId()){
                 Line red_line = new Line(street.get_Start_coord().getX(), street.get_Start_coord().getY(),
@@ -163,10 +166,10 @@ public class map_controller {
                 red_line.setStrokeWidth(5.0);//set it thicker than before
                 map_box.getChildren().add(red_line);//add it to scene over previously set values
             }
-        }
+        }*/
         // uzavreta Septimova
         // obchadzka cez Einsteinovu a Radarovu
-
+        main.ShowNewStage();
     }
 
     /**
