@@ -5,13 +5,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
-import sources.Coordinate;
 
 import java.util.Arrays;
 
 import java.util.List;
 
-public class Stop  implements Draw {
+public class Stop  implements Draw{
     private String name;
     private Coordinate coordinates;
     private String on_street;
@@ -45,4 +44,5 @@ public class Stop  implements Draw {
     public String getId(){
         return this.name;
     }
+
 }

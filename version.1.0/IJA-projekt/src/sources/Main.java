@@ -1,19 +1,25 @@
 package sources;
 
 import Controllers.map_controller;
+import Controllers.AltController;
 import Interfaces.Draw;
 import javafx.application.Application;
 import javafx.event.EventType;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import jdk.nashorn.api.scripting.ScriptUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
+import javax.sound.sampled.Line;
+import java.awt.*;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalTime;
@@ -21,20 +27,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Main extends Application {
+
     public static int NORMAL_BUS_SPEED = 55;
     private static Stage primaryStage;
-    List<Draw> elements_roads = new ArrayList<>();
-    List<Draw> elements_stops = new ArrayList<>();
-    List<Draw> elements_vehicles = new ArrayList<>();
-    List<Coordinate> streetCoor = new ArrayList<>();
-    List<String> linepath = new ArrayList<>();
-    BusLine busLine = null;
-    List<Coordinate> arraypath = new ArrayList<>();
-    List<Street> arraystreet = new ArrayList<>();
-    List<Stop> arraystop = new ArrayList<>();
-    JSONParser parser = new JSONParser();
-    List<String> array_buslines_numbers = new ArrayList<>();
-    List<LocalTime> array_buslines_leave_times = new ArrayList<>();
+
+    private static List<Draw> elements_roads = new ArrayList<>();
+    private static List<Draw> elements_stops = new ArrayList<>();
+    private List<Draw> elements_vehicles = new ArrayList<>();
+    private static List<Coordinate> streetCoor = new ArrayList<>();
+    private List<String> linepath = new ArrayList<>();
+    private BusLine busLine = null;
+    private List<Coordinate> arraypath = new ArrayList<>();
+    private static List<Street> arraystreet = new ArrayList<>();
+    private static List<Stop> arraystop = new ArrayList<>();
+    private static JSONParser parser = new JSONParser();
+    private static JSONParser alt_parser = new JSONParser();
+    private List<String> array_buslines_numbers = new ArrayList<>();
+    private List<LocalTime> array_buslines_leave_times = new ArrayList<>();
+
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -48,9 +58,6 @@ public class Main extends Application {
 
         map_controller map_controller = loader.getController();
 
-
-
-
         //each parsing needs new object
         Object obj = parser.parse(new FileReader("data/data.json"));
         City_Map_Init(obj, arraystop, arraystreet, streetCoor, elements_roads, elements_stops);
@@ -63,19 +70,30 @@ public class Main extends Application {
         map_controller.startTime(1);
 
     }
-
-    public static void ShowNewStage() throws IOException {
+    /**
+     * Method generate new stage for choosing alternative road when street is closed.
+     * @param closed_street Name of street that is closed (grey on map)
+     * @param street_list List of all streets
+     */
+    public static void ShowNewStage(String closed_street, List<Street> street_list) throws IOException, ParseException {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(Main.class.getResource("../Resources/alternative_road.fxml"));
         BorderPane closeStreet = loader.load();
 
         Stage addAlternativeStage = new Stage();
         addAlternativeStage.setTitle("Choose Alternative Road");
-        addAlternativeStage.initModality(Modality.WINDOW_MODAL);
+        addAlternativeStage.initModality(Modality.WINDOW_MODAL);//can not access any other window
         addAlternativeStage.initOwner(primaryStage);
         Scene scene = new Scene(closeStreet);
         addAlternativeStage.setScene(scene);
-        addAlternativeStage.showAndWait();
+        addAlternativeStage.show();
+
+        AltController alt_controller = loader.getController();
+        alt_controller.createMap(elements_roads, elements_stops); // initialize map
+        alt_controller.MarkClosedStreet(closed_street, street_list, arraystop); // mark closed street
+
+
+
     }
 
     /**
@@ -87,8 +105,8 @@ public class Main extends Application {
      * @param elements_roads List of Drawable objects containing streets and their names
      * @param elements_stops List of Drawable objects containing stops and their names
      */
-    public void City_Map_Init(Object obj, List<Stop> stops_list,List<Street> streets_list, List<Coordinate> street_Coordinates,
-                              List<Draw> elements_roads, List<Draw> elements_stops ){
+    public static void City_Map_Init(Object obj, List<Stop> stops_list, List<Street> streets_list, List<Coordinate> street_Coordinates,
+                                     List<Draw> elements_roads, List<Draw> elements_stops){
         JSONObject jsonObject = (JSONObject)obj; // conversion of object to jsonobject
 // Streets-------------------------------------------------------------------------------------------------------------------
         JSONArray ArrayStreets = (JSONArray) jsonObject.get("streets"); // streets from json stored into jsonarray

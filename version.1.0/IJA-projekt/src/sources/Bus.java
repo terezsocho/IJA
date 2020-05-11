@@ -169,6 +169,23 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
     public Coordinate update(LocalTime time, List<Street> restriction_lvl_1, List<Street> restriction_lvl_2, String closedStreet) {
         this.restriction_lvl_1 = restriction_lvl_1;
         this.restriction_lvl_2 = restriction_lvl_2;
+
+        //terez kod
+        this.closedStreet = closedStreet;
+        //System.out.println("closedStreet:" +this.closedStreet);
+        for (Street closed: bus_line_streets){
+            //System.out.print(closed.getId());
+            if(closed.getId() == this.closedStreet){
+                //System.out.println("nothing");
+                //Street temp_street = closed;
+                //bus_line_streets.remove(temp_street);
+            }
+            else{
+                alternative_bus_line.add(closed);
+            }
+        }
+        //terez kod
+        
         if (time.isAfter(least_At)) {// if bus started its route
              distance = getNewPosition(distance);
             if (distance > path.getPathSize()) {
