@@ -172,11 +172,11 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
 
         //terez kod
         this.closedStreet = closedStreet;
-        System.out.println("closedStreet:" +this.closedStreet);
+        //System.out.println("closedStreet:" +this.closedStreet);
         for (Street closed: bus_line_streets){
-            System.out.print(closed.getId());
+            //System.out.print(closed.getId());
             if(closed.getId() == this.closedStreet){
-                System.out.println("nothing");
+                //System.out.println("nothing");
                 //Street temp_street = closed;
                 //bus_line_streets.remove(temp_street);
             }

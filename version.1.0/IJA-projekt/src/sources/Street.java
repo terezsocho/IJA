@@ -4,7 +4,6 @@ import Interfaces.Draw;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
-import sources.Coordinate;
 
 import java.util.Arrays;
 
@@ -41,4 +40,6 @@ public class Street implements Draw {
                 new Line(start_coord.getX(), start_coord.getY(), end_coord.getX(), end_coord.getY())
         );
     }
+
+
 }

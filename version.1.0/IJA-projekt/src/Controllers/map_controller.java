@@ -26,6 +26,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
+import org.json.simple.parser.ParseException;
 import sources.Coordinate;
 import sources.Main;
 import sources.Stop;
@@ -42,8 +43,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class map_controller {
-    @FXML
-    private BorderPane rootPane;
+
     @FXML
     private Pane map_box = null;
     @FXML
@@ -77,6 +77,7 @@ public class map_controller {
     private List<Street> restriction_lvl_2 = new ArrayList<>();
     private String ClosedStreet;
     private Main main;
+
 
 
     /**
@@ -141,7 +142,7 @@ public class map_controller {
         double scale = 1.0;
         try {
             scale = Double.parseDouble(input_text_field.getText());//parse value from input text
-            if (scale < 0){ //negative value is not alowed
+            if (scale < 0){ //negative value is not allowed
                 Alert wrong_input = new Alert(Alert.AlertType.WARNING,"Text that was inputed is invalid.");
                 wrong_input.show();
                 return;
@@ -154,22 +155,17 @@ public class map_controller {
         animationTimer.stop();
         startTime(scale);//initiate new timer
     }
-
+    /**
+     * Method is called when button: close street is clicked
+     * Marks street that should be closed on primary stage
+     * Initialize second stage
+     */
     @FXML
-    private void OnCloseStreet(ActionEvent event) throws IOException {
-        /*ClosedStreet = closeStreet.getValue();
-        for(Street street : streets_list){
-            if (ClosedStreet == street.getId()){
-                Line red_line = new Line(street.get_Start_coord().getX(), street.get_Start_coord().getY(),
-                        street.get_End_coord().getX(), street.get_End_coord().getY());
-                red_line.setStroke(Color.GREY);
-                red_line.setStrokeWidth(5.0);//set it thicker than before
-                map_box.getChildren().add(red_line);//add it to scene over previously set values
-            }
-        }*/
-        // uzavreta Septimova
-        // obchadzka cez Einsteinovu a Radarovu
-        main.ShowNewStage();
+    private void OnCloseStreet(ActionEvent event) throws IOException, ParseException {
+        ClosedStreet = closeStreet.getValue();
+
+        main.ShowNewStage(ClosedStreet, streets_list);
+
     }
 
     /**
@@ -190,18 +186,19 @@ public class map_controller {
         this.elements_vehicles = elements_vehicles;
         this.array_buslines_numbers = array_buslines_numbers;
         this.streets_list = arraystreet;
-        System.out.println("Number of road elements: "+elements_roads.size());
+
+        //System.out.println("Number of road elements: "+elements_roads.size());
         for (Draw draw : elements_roads){ //Draw draw = elements[i];
             map_box.getChildren().addAll(draw.getGUI());//paints all the elements onto the scene
         }
 
-        System.out.println("Number of stop elements: "+elements_stops.size());
+        //System.out.println("Number of stop elements: "+elements_stops.size());
         for (Draw draw : elements_stops){ //Draw draw = elements[i];
             map_box.getChildren().addAll(draw.getGUI());//paints all the elements onto the scene
         }
 
         Coordinate temp = new Coordinate(0,0);//initialize list of current coordintaes so method set can be used in getLineInfo
-        System.out.println("Number of vehicles: "+elements_vehicles.size());
+        //System.out.println("Number of vehicles: "+elements_vehicles.size());
         for (Draw draw : elements_vehicles) { //Draw draw = elements[i];
             map_box.getChildren().addAll(draw.getGUI());//paints all the elements onto the scene
             updates.add((TimeUpdate) draw);
