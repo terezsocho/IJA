@@ -66,7 +66,7 @@ public class BusLine {
                 if (temp_array_stops.get(i).getOn_street().equals(streetname)) {//if street that stop is mounted on is equal to the streetname, so stop is on the same street as previous
                     realpath.add(temp_array_stops.get(i).getCoordinates());//add it to the list of coordinates realpath
                 } else {
-
+/*
                     if(getDistance(street.get_Start_coord(),temp_array_street.get(i).get_Start_coord()) <= 0.0005)
                         realpath.add(street.get_Start_coord());//if yes add this starting coordinate into a realpath
                     else if(getDistance(street.get_Start_coord(),temp_array_street.get(i).get_End_coord()) <= 0.0005)
@@ -75,7 +75,7 @@ public class BusLine {
                         realpath.add(street.get_End_coord());
                     else if(getDistance(street.get_End_coord(),temp_array_street.get(i).get_End_coord()) <= 0.0005)
                         realpath.add(street.get_End_coord());
-/*
+*/
                     if (street.get_Start_coord().equals(temp_array_street.get(i).get_Start_coord())) {//check if streets have same starting coordinates
                         realpath.add(street.get_Start_coord());//if yes add this starting coordinate into a realpath
                     } else if (street.get_Start_coord().equals(temp_array_street.get(i).get_End_coord())) {
@@ -84,7 +84,7 @@ public class BusLine {
                         realpath.add(street.get_End_coord());
                     } else if(street.get_End_coord().equals(temp_array_street.get(i).get_Start_coord())){
                         realpath.add(street.get_End_coord());
-                    }*/
+                    }
                     realpath.add(temp_array_stops.get(i).getCoordinates());
                 }
             }

@@ -23,6 +23,18 @@ import java.util.List;
 public class Main extends Application {
     public static int NORMAL_BUS_SPEED = 55;
     private static Stage primaryStage;
+    List<Draw> elements_roads = new ArrayList<>();
+    List<Draw> elements_stops = new ArrayList<>();
+    List<Draw> elements_vehicles = new ArrayList<>();
+    List<Coordinate> streetCoor = new ArrayList<>();
+    List<String> linepath = new ArrayList<>();
+    BusLine busLine = null;
+    List<Coordinate> arraypath = new ArrayList<>();
+    List<Street> arraystreet = new ArrayList<>();
+    List<Stop> arraystop = new ArrayList<>();
+    JSONParser parser = new JSONParser();
+    List<String> array_buslines_numbers = new ArrayList<>();
+    List<LocalTime> array_buslines_leave_times = new ArrayList<>();
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -36,18 +48,7 @@ public class Main extends Application {
 
         map_controller map_controller = loader.getController();
 
-        List<Draw> elements_roads = new ArrayList<>();
-        List<Draw> elements_stops = new ArrayList<>();
-        List<Draw> elements_vehicles = new ArrayList<>();
-        List<Coordinate> streetCoor = new ArrayList<>();
-        List<String> linepath = new ArrayList<>();
-        BusLine busLine = null;
-        List<Coordinate> arraypath = new ArrayList<>();
-        List<Street> arraystreet = new ArrayList<>();
-        List<Stop> arraystop = new ArrayList<>();
-        JSONParser parser = new JSONParser();
-        List<String> array_buslines_numbers = new ArrayList<>();
-        List<LocalTime> array_buslines_leave_times = new ArrayList<>();
+
 
 
         //each parsing needs new object

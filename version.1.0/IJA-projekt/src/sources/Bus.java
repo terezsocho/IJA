@@ -169,24 +169,6 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
     public Coordinate update(LocalTime time, List<Street> restriction_lvl_1, List<Street> restriction_lvl_2, String closedStreet) {
         this.restriction_lvl_1 = restriction_lvl_1;
         this.restriction_lvl_2 = restriction_lvl_2;
-
-        //terez kod
-        this.closedStreet = closedStreet;
-        System.out.println("closedStreet:" +this.closedStreet);
-        for (Street closed: bus_line_streets){
-            System.out.print(closed.getId());
-            if(closed.getId() == this.closedStreet){
-                System.out.println("nothing");
-                //Street temp_street = closed;
-                //bus_line_streets.remove(temp_street);
-            }
-            else{
-                alternative_bus_line.add(closed);
-            }
-        }
-
-        //terez kod
-
         if (time.isAfter(least_At)) {// if bus started its route
              distance = getNewPosition(distance);
             if (distance > path.getPathSize()) {
@@ -215,7 +197,6 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
         List<Integer> indexes_busLine_restr_lvl_1 = new ArrayList<>();
         boolean start_inserted = false, end_inserted = false;
         Coordinate start_coord_restr_street, end_coord_restr_street;
-
         if(restriction_lvl_1.size() > 0) { // if list is not empty
             for(Street street: restriction_lvl_1) { // for every street with level 1 restrictions
                 if (bus_line_streets.contains(street)) { // check if currently examined busline travels throught street
@@ -225,6 +206,7 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
 
                 for (int i = 0; i < line_coordinates.size(); i++) {
                     Coordinate temp_line_coord = line_coordinates.get(i);//examine each coordinate on a busline
+
                     if (temp_line_coord.equals(start_coord_restr_street)){
                         start_inserted = true;
                         indexes_busLine_restr_lvl_1.add(i); //insert index of coordinate from busline coordniate list
@@ -241,6 +223,16 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
             //if number of indexes is odd then add 0 to beginning because route started in the middle of a street
             if(indexes_busLine_restr_lvl_1.size() % 2 == 1) indexes_busLine_restr_lvl_1.add(0,0);
 
+            for (int j = 1; j < indexes_busLine_restr_lvl_1.size() ; j+=2) {
+                int temp_1 = indexes_busLine_restr_lvl_1.get(j-1);
+                int temp_2 = indexes_busLine_restr_lvl_1.get(j);
+                int temp = Math.abs(temp_1 - temp_2);
+                //System.out.println("Hodnota temp: " + temp);
+                if (temp > 5) {
+                    indexes_busLine_restr_lvl_1.set(j, indexes_busLine_restr_lvl_1.get(j-1));
+                    indexes_busLine_restr_lvl_1.set(j-1, 0);
+                }
+            }
             //sorting of a list for easier indexing
             indexes_busLine_restr_lvl_1 =  indexes_busLine_restr_lvl_1.stream().sorted().collect(Collectors.toList());
         }
@@ -264,9 +256,6 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
             }
             start_restricted_streets_lvl_1.add(temp_distance_until_restr);
         }
-        //sort lists from smallest to highest value
-        start_restricted_streets_lvl_1 = start_restricted_streets_lvl_1.stream().sorted().collect(Collectors.toList());
-        lengths_of_restricted_streets_lvl_1 = lengths_of_restricted_streets_lvl_1.stream().sorted().collect(Collectors.toList());
     }
 
 
@@ -304,6 +293,16 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
             //if number of indexes is odd then add 0 to beginning because route started in the middle of a street
             if(indexes_busLine_restr_lvl_2.size() % 2 == 1) indexes_busLine_restr_lvl_2.add(0,0);
 
+            for (int j = 1; j < indexes_busLine_restr_lvl_2.size() ; j+=2) {
+                int temp_1 = indexes_busLine_restr_lvl_2.get(j-1);
+                int temp_2 = indexes_busLine_restr_lvl_2.get(j);
+                int temp = Math.abs(temp_1 - temp_2);
+                //System.out.println("Hodnota temp: " + temp);
+                if (temp > 5) {
+                    indexes_busLine_restr_lvl_2.set(j, indexes_busLine_restr_lvl_2.get(j-1));
+                    indexes_busLine_restr_lvl_2.set(j-1, 0);
+                }
+            }
             //sorting of a list for easier indexing
             indexes_busLine_restr_lvl_2 =  indexes_busLine_restr_lvl_2.stream().sorted().collect(Collectors.toList());
         }
@@ -326,11 +325,7 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
             }
             start_restricted_streets_lvl_2.add(temp_distance_until_restr);
         }
-        //sort lists according to value froms smallest to highest
-        start_restricted_streets_lvl_2 = start_restricted_streets_lvl_2.stream().sorted().collect(Collectors.toList());
-        lengths_of_restricted_streets_lvl_2 = lengths_of_restricted_streets_lvl_2.stream().sorted().collect(Collectors.toList());
     }
-
 
 
     int restricted_lvl_1_index = 0;
@@ -345,9 +340,25 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
         checkRestrictionLevel1();
         checkRestrictionLevel2();
 
-        /*System.out.println("Previous distance "+distance);
-        System.out.println("Speed + distance would be "+(distance+speed));
-*/
+        //System.out.println("Previous distance "+distance);
+        //System.out.println("Speed + distance would be "+(distance+speed));
+
+      /*  System.out.println("restricted_lvl_1_index "+restricted_lvl_1_index);
+        System.out.println("start_restricted_streets_lvl_1 " + start_restricted_streets_lvl_1);
+        System.out.println("lengths_of_restricted_streets_lvl_1 " + lengths_of_restricted_streets_lvl_1);
+        System.out.println();
+        System.out.println("restricted_lvl_2_index "+restricted_lvl_2_index);
+        System.out.println("start_restricted_streets_lvl_2 " + start_restricted_streets_lvl_2);
+        System.out.println("lengths_of_restricted_streets_lvl_2 " + lengths_of_restricted_streets_lvl_2);*/
+
+        if(restricted_lvl_1_index == lengths_of_restricted_streets_lvl_1.size()){
+            //precaution in case that route changes restriction level during bus traveling on a route
+            restricted_lvl_1_index = 0;
+        }
+        if(restricted_lvl_2_index == lengths_of_restricted_streets_lvl_2.size()){
+            //precaution in case that route changes restriction level during bus traveling on a route
+            restricted_lvl_2_index = 0;
+        }
         if(start_restricted_streets_lvl_1.size() > 0 && lengths_of_restricted_streets_lvl_1.size() > 0) {
             restricted = start_restricted_streets_lvl_1.get(restricted_lvl_1_index);
             restricted_length = lengths_of_restricted_streets_lvl_1.get(restricted_lvl_1_index);
@@ -356,8 +367,9 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
                     distance += this.speed / 2;
                 }
                 else{
-                    if(index < lengths_of_restricted_streets_lvl_1.size()) index++;//index can not exceed length-1
-
+                    if(restricted_lvl_1_index < lengths_of_restricted_streets_lvl_1.size()-1){
+                        restricted_lvl_1_index++;//index can not exceed length-1
+                    }
                     restricted = start_restricted_streets_lvl_1.get(restricted_lvl_1_index);//assign new values from list
                     restricted_length = lengths_of_restricted_streets_lvl_1.get(restricted_lvl_1_index);
                     if (distance < (restricted + restricted_length)) {//check again if next street is also restricted
@@ -376,7 +388,7 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
                     distance += this.speed / 3;
                 }
                 else{
-                    if(index < lengths_of_restricted_streets_lvl_2.size()) index++;//index can not exceed length-1
+                    if(restricted_lvl_2_index < lengths_of_restricted_streets_lvl_2.size()-1) restricted_lvl_2_index++;//index can not exceed length-1
 
                     restricted = start_restricted_streets_lvl_2.get(restricted_lvl_2_index);//assign new values from list
                     restricted_length = lengths_of_restricted_streets_lvl_2.get(restricted_lvl_2_index);
