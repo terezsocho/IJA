@@ -3,44 +3,29 @@ package Controllers;
 import Interfaces.Draw;
 import Interfaces.LineInfo;
 import Interfaces.TimeUpdate;
-import com.sun.scenario.animation.AbstractMasterTimer;
 import javafx.animation.AnimationTimer;
-import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.event.EventTarget;
-import javafx.event.EventType;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
-import javafx.util.Duration;
 import org.json.simple.parser.ParseException;
 import sources.Coordinate;
 import sources.Main;
 import sources.Stop;
 import sources.Street;
-
 import java.io.IOException;
-import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+
 
 public class map_controller {
 
@@ -163,7 +148,6 @@ public class map_controller {
     @FXML
     private void OnCloseStreet(ActionEvent event) throws IOException, ParseException {
         ClosedStreet = closeStreet.getValue();
-
         main.ShowNewStage(ClosedStreet, streets_list);
 
     }
@@ -187,18 +171,17 @@ public class map_controller {
         this.array_buslines_numbers = array_buslines_numbers;
         this.streets_list = arraystreet;
 
-        //System.out.println("Number of road elements: "+elements_roads.size());
+
         for (Draw draw : elements_roads){ //Draw draw = elements[i];
             map_box.getChildren().addAll(draw.getGUI());//paints all the elements onto the scene
         }
 
-        //System.out.println("Number of stop elements: "+elements_stops.size());
         for (Draw draw : elements_stops){ //Draw draw = elements[i];
             map_box.getChildren().addAll(draw.getGUI());//paints all the elements onto the scene
         }
 
         Coordinate temp = new Coordinate(0,0);//initialize list of current coordintaes so method set can be used in getLineInfo
-        //System.out.println("Number of vehicles: "+elements_vehicles.size());
+
         for (Draw draw : elements_vehicles) { //Draw draw = elements[i];
             map_box.getChildren().addAll(draw.getGUI());//paints all the elements onto the scene
             updates.add((TimeUpdate) draw);
@@ -209,7 +192,6 @@ public class map_controller {
     }
 
     private AnimationTimer animationTimer;
-
 
     /**
      * Method creates timertask to be repeated every second to simulate movement of buses.
@@ -222,7 +204,9 @@ public class map_controller {
                 if(frameCount == Math.round(scale*60) ) {
                     time = time.plusSeconds(1) ;
                     for (int index=0; index < updates.size(); index++) {
-                        Coordinate bus_pos_temp = updates.get(index).update(time, restriction_lvl_1, restriction_lvl_2, ClosedStreet);
+                        //System.out.println(Main.alt_road_list);
+
+                        Coordinate bus_pos_temp = updates.get(index).update(time, restriction_lvl_1, restriction_lvl_2, ClosedStreet, Main.alt_road_list);
                         buses_current_positions.set(index, bus_pos_temp);
                         map_box.layout();
                     }

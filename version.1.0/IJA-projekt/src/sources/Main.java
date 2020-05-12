@@ -24,6 +24,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Main extends Application {
@@ -38,13 +39,13 @@ public class Main extends Application {
     private List<String> linepath = new ArrayList<>();
     private BusLine busLine = null;
     private List<Coordinate> arraypath = new ArrayList<>();
-    private static List<Street> arraystreet = new ArrayList<>();
+    public static List<Street> arraystreet = new ArrayList<>();
     private static List<Stop> arraystop = new ArrayList<>();
     private static JSONParser parser = new JSONParser();
     private static JSONParser alt_parser = new JSONParser();
     private List<String> array_buslines_numbers = new ArrayList<>();
     private List<LocalTime> array_buslines_leave_times = new ArrayList<>();
-
+    //public static List<Street> AllStreetList = new ArrayList<>();
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -70,6 +71,9 @@ public class Main extends Application {
         map_controller.startTime(1);
 
     }
+
+    public static List<Stop> alt_road_list = new ArrayList<>();
+
     /**
      * Method generate new stage for choosing alternative road when street is closed.
      * @param closed_street Name of street that is closed (grey on map)
@@ -87,6 +91,7 @@ public class Main extends Application {
         Scene scene = new Scene(closeStreet);
         addAlternativeStage.setScene(scene);
         addAlternativeStage.show();
+
 
         AltController alt_controller = loader.getController();
         alt_controller.createMap(elements_roads, elements_stops); // initialize map

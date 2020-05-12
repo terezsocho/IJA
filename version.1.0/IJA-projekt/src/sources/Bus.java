@@ -18,6 +18,7 @@ import javafx.util.Duration;
 import java.security.cert.X509Certificate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +32,7 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
     private String id;
     private List<Coordinate> line_coordinates;
     private List<Stop> bus_line_stops;  //does not need to ne initialized, constructor does that
+    private List<Stop> alt_stops_list = new ArrayList<>();
     private List<Street> bus_line_streets; //does not need to ne initialized, constructor does that
     private List<Street> alternative_bus_line  = new ArrayList<>();
     private LocalTime least_At;
@@ -159,6 +161,55 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
         return gui;
     }
 
+    public List<Coordinate> Alternative_road(List<Stop>stop_list){
+        List <Coordinate> coor_list = new ArrayList<>();
+        List <Street> street_list = new ArrayList<>();
+        List <String> name_list = new ArrayList<>();
+        Street street;
+        String streetname = null;
+
+        for(Stop stop: stop_list){
+            System.out.println("STOP: " +stop.getName());
+            name_list.add(stop.getOn_street());
+        }
+
+        for (int a = 0; a < name_list.size(); a++) {
+            for (int b = 0; b < Main.arraystreet.size(); b++) {
+                if (name_list.get(a).equals(Main.arraystreet.get(b).getId())) {//check if I need a street
+                    street_list.add(Main.arraystreet.get(b)); //if yes add it to the array of streets
+                }
+            }
+        }
+
+        street = street_list.get(0); // assign first street too variable street
+        for (int i = 0; i < stop_list.size(); i++) {
+            if ((i == 0)) {//if first
+                coor_list.add(stop_list.get(i).getCoordinates());//add to the list of coordinates realpath coordinates of that stop
+            }
+            else {
+
+                if (stop_list.get(i).getOn_street().equals(streetname)) {//if street that stop is mounted on is equal to the streetname, so stop is on the same street as previous
+                    coor_list.add(stop_list.get(i).getCoordinates());//add it to the list of coordinates realpath
+                } else {
+
+                    if (street.get_Start_coord().equals(street_list.get(i).get_Start_coord())) {//check if streets have same starting coordinates
+                        coor_list.add(street.get_Start_coord());//if yes add this starting coordinate into a realpath
+                    } else if (street.get_Start_coord().equals(street_list.get(i).get_End_coord())) {
+                        coor_list.add(street.get_Start_coord());
+                    } else if (street.get_End_coord().equals(street_list.get(i).get_End_coord())) {
+                        coor_list.add(street.get_End_coord());
+                    } else if(street.get_End_coord().equals(street_list.get(i).get_Start_coord())){
+                        coor_list.add(street.get_End_coord());
+                    }
+                    coor_list.add(stop_list.get(i).getCoordinates());
+                }
+            }
+            streetname = stop_list.get(i).getOn_street();
+            street = street_list.get(i);
+        }
+        return coor_list;
+    }
+
     boolean set_immutable_bus_stop = true;
     /**
      * Method updates positions of a bus on a canvas to its next position
@@ -166,25 +217,78 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
      * @return Coordinate of current bus position.
      */
     @Override
-    public Coordinate update(LocalTime time, List<Street> restriction_lvl_1, List<Street> restriction_lvl_2, String closedStreet) {
+    public Coordinate update(LocalTime time, List<Street> restriction_lvl_1, List<Street> restriction_lvl_2, String closedStreet, List<Stop> alt_stops_list) {
         this.restriction_lvl_1 = restriction_lvl_1;
         this.restriction_lvl_2 = restriction_lvl_2;
-
-        //terez kod
+        this.alt_stops_list = alt_stops_list;
         this.closedStreet = closedStreet;
-        //System.out.println("closedStreet:" +this.closedStreet);
-        for (Street closed: bus_line_streets){
-            //System.out.print(closed.getId());
-            if(closed.getId() == this.closedStreet){
-                //System.out.println("nothing");
-                //Street temp_street = closed;
-                //bus_line_streets.remove(temp_street);
+        //List<Coordinate> tempListCoor = new ArrayList<>();
+        List <Integer> index_st = new ArrayList<>();
+
+////////////////////////////////////////////////////////////////////
+        if((this.closedStreet != null) && (this.alt_stops_list.size() > 0)){
+            List<Coordinate> alt_coor_list = null;
+            alt_coor_list = Alternative_road(this.alt_stops_list);
+            for(Coordinate coor: alt_coor_list){
+                System.out.println("COOR: " +coor.getX());
+                System.out.println("COOR: " +coor.getY());
             }
-            else{
-                alternative_bus_line.add(closed);
+            System.out.println("size of coor_list : " +this.line_coordinates.size());
+            System.out.println("closedStreet: " +closedStreet);
+            System.out.println("alternative road : " +alt_stops_list);
+            int n = 0;
+            for(Coordinate coor: this.line_coordinates){
+                System.out.println("COOR x: " +coor.getX() + "COOR y: " +coor.getY());
             }
+            for (Stop stop : bus_line_stops) {
+                if (stop.getOn_street() == closedStreet) {
+                    for (Coordinate coordinates : this.line_coordinates) {
+                        if ((coordinates.getX() == stop.getCoordinates().getX()) && (coordinates.getY() == stop.getCoordinates().getY())) {//Coordinate temp_coor = coordinates;
+                                //this.line_coordinates.remove(temp_coor);
+                            //System.out.println("1");
+                            index_st.add(this.line_coordinates.indexOf(coordinates));
+                            n = n + 1 ;
+                        }
+                    }
+                }
+            }
+            System.out.println("n : " +n);
+            if((index_st.size() > 0)){
+                System.out.println("index size: " +index_st.size() );
+                /*for (int i = 0; i < index_st.size(); i++) {
+                    System.out.println("index to remove" +index_st.get(i));
+                    this.line_coordinates.remove(index_st.get(i));
+                }*/
+                int remove_index = index_st.get(0);
+                for(int i = 0; i < index_st.size(); i++){
+                    this.line_coordinates.remove(remove_index);
+                }
+                for(Coordinate coor: this.line_coordinates){
+                    System.out.println("COOR x: " +coor.getX() + "COOR y: " +coor.getY());
+                }
+
+                int w = index_st.get(0);
+                int v = 0;
+                System.out.println("w pred while " +w);
+                System.out.println("v pred while " +v);
+                while( v < (alt_coor_list.size())){
+                    this.line_coordinates.add(w, alt_coor_list.get(v));
+                    w++;
+                    v++;
+                    System.out.println("w vo while " +w);
+                    System.out.println("v vo while " +v);
+                }
+
+            }
+            System.out.println("size of coor_list : " +this.line_coordinates.size());
+            //}
+            //}
+            //System.out.println("bus line stops: " +this.bus_line_stops);
+            //line_coordinates.clear();
+            //Collections.copy(line_coordinates, tempListCoor);
+            //System.out.println("alternative road coor : " +line_coordinates);
         }
-        //terez kod
+//////////////////////////////////////////////////////Terez
         
         if (time.isAfter(least_At)) {// if bus started its route
              distance = getNewPosition(distance);
@@ -356,17 +460,6 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
         double restricted, restricted_length;
         checkRestrictionLevel1();
         checkRestrictionLevel2();
-
-        //System.out.println("Previous distance "+distance);
-        //System.out.println("Speed + distance would be "+(distance+speed));
-
-      /*  System.out.println("restricted_lvl_1_index "+restricted_lvl_1_index);
-        System.out.println("start_restricted_streets_lvl_1 " + start_restricted_streets_lvl_1);
-        System.out.println("lengths_of_restricted_streets_lvl_1 " + lengths_of_restricted_streets_lvl_1);
-        System.out.println();
-        System.out.println("restricted_lvl_2_index "+restricted_lvl_2_index);
-        System.out.println("start_restricted_streets_lvl_2 " + start_restricted_streets_lvl_2);
-        System.out.println("lengths_of_restricted_streets_lvl_2 " + lengths_of_restricted_streets_lvl_2);*/
 
         if(restricted_lvl_1_index == lengths_of_restricted_streets_lvl_1.size()){
             //precaution in case that route changes restriction level during bus traveling on a route

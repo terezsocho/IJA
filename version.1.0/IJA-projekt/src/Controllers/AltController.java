@@ -14,6 +14,7 @@ import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 
 import javafx.stage.Stage;
+import sources.Main;
 import sources.Stop;
 import sources.Street;
 
@@ -28,6 +29,7 @@ public class AltController{
     private List<Stop> stops_list = new ArrayList<>();
     private List<Stop> alt_road_list = new ArrayList<>();
 
+
     @FXML
     private Pane alt_box = null;
 
@@ -38,6 +40,7 @@ public class AltController{
     public void handleCloseButtonAction(ActionEvent event) {
 
         Stage stage = (Stage) closeButton.getScene().getWindow();
+        Main.alt_road_list = alt_road_list;
         stage.close();
     }
 
