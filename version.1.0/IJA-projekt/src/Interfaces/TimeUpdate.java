@@ -1,7 +1,7 @@
 package Interfaces;
-import sources.Coordinate;
-import sources.Stop;
-import sources.Street;
+import Sources.Coordinate;
+import Sources.Stop;
+import Sources.Street;
 
 import java.time.LocalTime;
 import java.util.List;

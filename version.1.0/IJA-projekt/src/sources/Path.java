@@ -1,12 +1,14 @@
-package sources;
-
-import sources.Coordinate;
+package Sources;
 
 import java.util.List;
 
 public class Path {
 
     private List<Coordinate> path;
+    /**
+     * Constructor for Path object.
+     * @param path list of coordinates which determines path of bus
+     */
     public Path(List<Coordinate> path) {
         this.path = path;
     }
@@ -18,7 +20,8 @@ public class Path {
      * @return Double value of meters to travel between two coordinates
      */
     private double getDistance(Coordinate a, Coordinate b){
-        return Math.sqrt(Math.pow(a.getX() - b.getX(),2) + Math.pow(a.getY() - b.getY(),2));
+        //sqrt(x^2 + y^2)
+        return Math.sqrt(Math.pow(a.getX() - b.getX(),2) + Math.pow(a.getY() - b.getY(),2));//distance btw 2 points
     }
 
     /**
@@ -28,19 +31,19 @@ public class Path {
     public List<Coordinate> getPathCoord() { return path;}
 
     /**
-     *  Method calculates a current coordinate of a bus once new distance that was travelled is added.
+     * Method calculates a current coordinate of a bus once new distance that was travelled is added.
      * @param distance double value representing value in meters that bus travelled
      * @return Coordinate of new bus position.
      */
     public Coordinate getCoorBus(double distance) {
 
         double len = 0;
-        Coordinate a = null;
-        Coordinate b = null;
-        for (int i = 0; i < path.size() - 1; i++) {
-            a = path.get(i);
-            b = path.get(i + 1);
-            if (len + getDistance(a, b) >= distance) {
+        Coordinate a = null;//initialization
+        Coordinate b = null;//initialization
+        for (int i = 0; i < path.size() - 1; i++) {//looping until end of path
+            a = path.get(i);//from
+            b = path.get(i + 1);//to
+            if (len + getDistance(a, b) >= distance) {//len is greater that travelled route
                 break;
             }
             len += getDistance(a, b);
@@ -58,9 +61,9 @@ public class Path {
      */
     public double getPathSize() {
         double size = 0;
-        for (int i = 0; i < path.size() - 1; i++) {
+        for (int i = 0; i < path.size() - 1; i++) {//looping until last element of path list
             size = size + getDistance(path.get(i), path.get(i + 1));
         }
-        return size;
+        return size;//length of whole route
     }
 }

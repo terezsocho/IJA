@@ -1,30 +1,23 @@
-package sources;
+package Sources;
 
-import Controllers.map_controller;
+import Controllers.MainController;
 import Controllers.AltController;
 import Interfaces.Draw;
 import javafx.application.Application;
-import javafx.event.EventType;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import jdk.nashorn.api.scripting.ScriptUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-
-import javax.sound.sampled.Line;
-import java.awt.*;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class Main extends Application {
@@ -45,8 +38,13 @@ public class Main extends Application {
     private static JSONParser alt_parser = new JSONParser();
     private List<String> array_buslines_numbers = new ArrayList<>();
     private List<LocalTime> array_buslines_leave_times = new ArrayList<>();
-    //public static List<Street> AllStreetList = new ArrayList<>();
+    public static List<Stop> alt_road_list = new ArrayList<>();//array to obtain info from second stage to first one.
 
+
+    /**
+     * Method generate primary stage. Set all the parameters. Create main object of json file.
+     * @param primaryStage main window of an application
+     */
     @Override
     public void start(Stage primaryStage) throws Exception {
         this.primaryStage = primaryStage;
@@ -57,7 +55,7 @@ public class Main extends Application {
         primaryStage.setScene(new Scene(root, 1350, 860));// add scene to the stage
         primaryStage.show();// make the stage visible
 
-        map_controller map_controller = loader.getController();
+        MainController main_controller = loader.getController();
 
         //each parsing needs new object
         Object obj = parser.parse(new FileReader("data/data.json"));
@@ -66,13 +64,11 @@ public class Main extends Application {
                 array_buslines_numbers, array_buslines_leave_times);
 
 
-        map_controller.setElements(elements_roads, elements_stops, elements_vehicles, array_buslines_numbers,
+        main_controller.setElements(elements_roads, elements_stops, elements_vehicles, array_buslines_numbers,
                                     array_buslines_leave_times, arraystreet );
-        map_controller.startTime(1);
+        main_controller.startTime(1);
 
     }
-
-    public static List<Stop> alt_road_list = new ArrayList<>();
 
     /**
      * Method generate new stage for choosing alternative road when street is closed.
@@ -81,13 +77,13 @@ public class Main extends Application {
      */
     public static void ShowNewStage(String closed_street, List<Street> street_list) throws IOException, ParseException {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(Main.class.getResource("../Resources/alternative_road.fxml"));
+        loader.setLocation(Main.class.getResource("../Resources/alternative_road.fxml"));//load from fxml file
         BorderPane closeStreet = loader.load();
 
-        Stage addAlternativeStage = new Stage();
+        Stage addAlternativeStage = new Stage();//new window
         addAlternativeStage.setTitle("Choose Alternative Road");
         addAlternativeStage.initModality(Modality.WINDOW_MODAL);//can not access any other window
-        addAlternativeStage.initOwner(primaryStage);
+        addAlternativeStage.initOwner(primaryStage);//child of primary stage
         Scene scene = new Scene(closeStreet);
         addAlternativeStage.setScene(scene);
         addAlternativeStage.show();
@@ -195,7 +191,10 @@ public class Main extends Application {
             bus_Route_path.clear();
         }
     }
-
+    /**
+     * Main method declaration.
+     * @param args argumnets passed to main function
+     */
     public static void main(String[] args) {
         launch(args);//launch the application
     }

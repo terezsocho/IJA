@@ -1,21 +1,12 @@
-package sources;
+package Sources;
 
 import Interfaces.Draw;
 import Interfaces.LineInfo;
 import Interfaces.TimeUpdate;
-import javafx.animation.AnimationTimer;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.control.Button;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
-import javafx.util.Duration;
-
-import java.security.cert.X509Certificate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,7 +37,7 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
 
 
     /**
-     * Constructor for Bus elements.
+     * Constructor for Bus object.
      * @param id identification String of a busLine
      * @param path List of Coordinates for specific busline that each bus on thta bus line must pass
      * @param least_At List of LocalTimes that showcase departure times of all buses on busline from their first stop
@@ -69,8 +60,8 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
 
 
     /**
-     * Method returns identification information of a busline
-     * @return String containing a name of busline
+     * Method returns identification information of a bus line
+     * @return String containing a name of bus line
      */
     @Override
     public String getId() {
@@ -156,11 +147,17 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
     @Override
     public List<Shape> getGUI() {
         for (Shape shape : gui) {
-            shape.setVisible(false);//sets all busses in system to invisible until on road
+            shape.setVisible(false);//sets all buses in system to invisible until on road
         }
         return gui;
     }
 
+    /**
+     * Method calculates part of a route that is changed by closing a street.
+     * From stops on alternative route obtains coordinates of the route
+     * @param stop_list list of all stops that are part of new route
+     * @return List of coordinates for alternative part of route
+     */
     public List<Coordinate> Alternative_road(List<Stop>stop_list){
         List <Coordinate> coor_list = new ArrayList<>();
         List <Street> street_list = new ArrayList<>();
@@ -168,11 +165,14 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
         Street street;
         String streetname = null;
 
+        //only need street names are copied to new list
+        // needed streets are the one where stops of alternative route are calculated
         for(Stop stop: stop_list){
-            System.out.println("STOP: " +stop.getName());
             name_list.add(stop.getOn_street());
         }
 
+        //new street list is created
+        //contains only street on new bus line
         for (int a = 0; a < name_list.size(); a++) {
             for (int b = 0; b < Main.arraystreet.size(); b++) {
                 if (name_list.get(a).equals(Main.arraystreet.get(b).getId())) {//check if I need a street
@@ -210,10 +210,71 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
         return coor_list;
     }
 
+
+    /**
+     * Method checks from side of street is bus coming and where to strat alternative route
+     * according results returns list of stops that is reserved or not.
+     * @param ListStops list of stops that are part of new route
+     * @param NameStreet name of closed street
+     * @return List of stop for alternative part of route in right direction
+     */
+    public List<Stop> CheckDirection(List<Stop> ListStops, String NameStreet){
+        Street close = null;
+        // obtain all information (like coordinates and name ) about closed street
+        for(Street street : Main.arraystreet){
+            if(street.getId() == NameStreet){
+                close =  street;
+            }
+        }
+
+        Coordinate direction = null;
+        boolean is_bool = false;
+        for(Coordinate coor : this.line_coordinates){// looping in list of bus line coordinates
+            // if list contains coordinates of closed street
+            if((coor.getX() == close.get_End_coord().getX()) && (coor.getY() == close.get_End_coord().getY()) && is_bool == false){
+                direction = close.get_End_coord();
+                is_bool = true;// important because we want only coordinate of a street that was in list as a first on
+            }
+            if((coor.getX() == close.get_Start_coord().getX()) && (coor.getY() == close.get_Start_coord().getY()) && is_bool == false){
+                direction = close.get_Start_coord();//assigning to different var for future comparision
+                is_bool = true;
+            }
+        }
+
+        int size = ListStops.size();
+        //if bus line contains closed street
+        //if not returns the same list you get
+        if(direction != null){
+            //calculating distance between point that was detected in bus line list and
+            //point where first stop of alternative route is situated
+            double distance_1 = Math.sqrt(Math.pow((direction.getX() - ListStops.get(0).getCoordinates().getX()), 2)
+                    + Math.pow((direction.getY() - ListStops.get(0).getCoordinates().getY()), 2));
+            //calculating distance between point that was detected in bus line list and
+            //point where stop stop of alternative route is situated
+            double distance_2 = Math.sqrt(Math.pow((direction.getX() - ListStops.get(size-1).getCoordinates().getX()), 2)
+                    + Math.pow((direction.getY() - ListStops.get(size-1).getCoordinates().getY()), 2));
+
+            if(distance_1 > distance_2){
+                Collections.reverse(ListStops);//reverse - last element goes to first index, second last to second index ...
+                return ListStops;// return reverse list of stops
+            }
+            else{
+                return ListStops;//return unchanged list of stops
+            }
+
+        }
+
+        return ListStops;
+    }
+
     boolean set_immutable_bus_stop = true;
     /**
-     * Method updates positions of a bus on a canvas to its next position
+     * Method updates positions of a bus on a canvas to its next position and check if any street was closed
      * @param time LocalTime variable used to determine if bus is up for departure
+     * @param restriction_lvl_1 list of street where speed is slower because of restriction level 1
+     * @param restriction_lvl_2 list of street where speed is slower because of restriction level 2
+     * @param closedStreet name of street that is closed
+     * @param alt_stops_list list of stops which are on alternative part of route
      * @return Coordinate of current bus position.
      */
     @Override
@@ -222,80 +283,50 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
         this.restriction_lvl_2 = restriction_lvl_2;
         this.alt_stops_list = alt_stops_list;
         this.closedStreet = closedStreet;
-        //List<Coordinate> tempListCoor = new ArrayList<>();
-        List <Integer> index_st = new ArrayList<>();
+        List <Integer> index_st = new ArrayList<>();//list for indexes of coordinates that should be deleted
 
-////////////////////////////////////////////////////////////////////
+        //if any street was closed and alternative route was set
         if((this.closedStreet != null) && (this.alt_stops_list.size() > 0)){
+            //check direction of a bus
+            //this.alt_stops_list = CheckDirection(this.alt_stops_list, this.closedStreet);
             List<Coordinate> alt_coor_list = null;
-            alt_coor_list = Alternative_road(this.alt_stops_list);
-            for(Coordinate coor: alt_coor_list){
-                System.out.println("COOR: " +coor.getX());
-                System.out.println("COOR: " +coor.getY());
-            }
-            System.out.println("size of coor_list : " +this.line_coordinates.size());
-            System.out.println("closedStreet: " +closedStreet);
-            System.out.println("alternative road : " +alt_stops_list);
-            int n = 0;
-            for(Coordinate coor: this.line_coordinates){
-                System.out.println("COOR x: " +coor.getX() + "COOR y: " +coor.getY());
-            }
-            for (Stop stop : bus_line_stops) {
-                if (stop.getOn_street() == closedStreet) {
-                    for (Coordinate coordinates : this.line_coordinates) {
-                        if ((coordinates.getX() == stop.getCoordinates().getX()) && (coordinates.getY() == stop.getCoordinates().getY())) {//Coordinate temp_coor = coordinates;
-                                //this.line_coordinates.remove(temp_coor);
-                            //System.out.println("1");
+            alt_coor_list = Alternative_road(this.alt_stops_list);//returns real path of alternative route
+
+            for (Stop stop : bus_line_stops) {//looping in all coordinates that determines real path of bus
+                if (stop.getOn_street() == closedStreet) {//if we are on a closed street
+                    for (Coordinate coordinates : this.line_coordinates) {//take all coordinates of stops on this street
+                        if ((coordinates.getX() == stop.getCoordinates().getX()) && (coordinates.getY() == stop.getCoordinates().getY())) {
                             index_st.add(this.line_coordinates.indexOf(coordinates));
-                            n = n + 1 ;
                         }
                     }
                 }
             }
-            System.out.println("n : " +n);
+            //changing route to alternative route by adding new and deleting old coordinates
+            //remove all
             if((index_st.size() > 0)){
-                System.out.println("index size: " +index_st.size() );
-                /*for (int i = 0; i < index_st.size(); i++) {
-                    System.out.println("index to remove" +index_st.get(i));
-                    this.line_coordinates.remove(index_st.get(i));
-                }*/
+
                 int remove_index = index_st.get(0);
-                for(int i = 0; i < index_st.size(); i++){
+                for(int i = 0; i < index_st.size(); i++){//remove coordinates all given index obtained in above cycle
                     this.line_coordinates.remove(remove_index);
-                }
-                for(Coordinate coor: this.line_coordinates){
-                    System.out.println("COOR x: " +coor.getX() + "COOR y: " +coor.getY());
                 }
 
                 int w = index_st.get(0);
                 int v = 0;
-                System.out.println("w pred while " +w);
-                System.out.println("v pred while " +v);
+                //add all new coordinates starting on index from where all coordinates were deleted
                 while( v < (alt_coor_list.size())){
                     this.line_coordinates.add(w, alt_coor_list.get(v));
                     w++;
                     v++;
-                    System.out.println("w vo while " +w);
-                    System.out.println("v vo while " +v);
                 }
-
             }
-            System.out.println("size of coor_list : " +this.line_coordinates.size());
-            //}
-            //}
-            //System.out.println("bus line stops: " +this.bus_line_stops);
-            //line_coordinates.clear();
-            //Collections.copy(line_coordinates, tempListCoor);
-            //System.out.println("alternative road coor : " +line_coordinates);
         }
-//////////////////////////////////////////////////////Terez
         
         if (time.isAfter(least_At)) {// if bus started its route
              distance = getNewPosition(distance);
             if (distance > path.getPathSize()) {
                 // only moves it to final destination once, if repeated moveGUi still moves it by small margin
                 if (set_immutable_bus_stop == true) {
-                    System.out.println(path.getPathSize());
+                    //System.out.println(path.getPathSize());
                     Coordinate coords = path.getCoorBus(path.getPathSize());
                     moveGUI(coords);
                     removeGUI();
@@ -529,7 +560,7 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
      * @return List of Coordinates
      */
     @Override
-    public List<sources.Coordinate> getLinePath() {
+    public List<Coordinate> getLinePath() {
         return line_coordinates;
     }
 

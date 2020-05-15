@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="950.0" prefWidth="1300.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.map_controller">
+<BorderPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="950.0" prefWidth="1300.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.MainController">
    <center>
       <ScrollPane pannable="true" prefHeight="618.0" prefWidth="1062.0" BorderPane.alignment="CENTER">
          <content>
@@ -20,7 +20,7 @@
    <left>
       <SplitPane dividerPositions="0.388021931674399" orientation="VERTICAL" prefHeight="950.0" prefWidth="317.0" BorderPane.alignment="CENTER">
         <items>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="366.0" prefWidth="264.0">
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="419.0" prefWidth="316.0">
                <children>
                   <TextField fx:id="input_text_field" layoutX="38.0" layoutY="22.0" prefHeight="26.0" prefWidth="67.0" />
                   <Button layoutX="193.0" layoutY="22.0" mnemonicParsing="false" onAction="#onTimeScaleChange" prefHeight="26.0" prefWidth="92.0" text="Scale Time" textAlignment="CENTER" />

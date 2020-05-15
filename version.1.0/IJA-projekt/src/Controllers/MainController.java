@@ -3,6 +3,10 @@ package Controllers;
 import Interfaces.Draw;
 import Interfaces.LineInfo;
 import Interfaces.TimeUpdate;
+import Sources.Coordinate;
+import Sources.Main;
+import Sources.Stop;
+import Sources.Street;
 import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -17,17 +21,13 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import org.json.simple.parser.ParseException;
-import sources.Coordinate;
-import sources.Main;
-import sources.Stop;
-import sources.Street;
+
 import java.io.IOException;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-
-public class map_controller {
+public class MainController {
 
     @FXML
     private Pane map_box = null;
@@ -51,7 +51,7 @@ public class map_controller {
     private List<Draw> elements_stops = new ArrayList<>();
     private List<Draw> elements_vehicles = new ArrayList<>();
     private List<String> array_buslines_numbers;
-    private LocalTime time = LocalTime.of(10,43,14); //inicializes to a same time
+    private LocalTime time = LocalTime.of(10,43,14); //initializes to a same time
     private List<Coordinate> buses_current_positions = new ArrayList<>();
     private boolean bus_line_already_chosen = false;
     private List <LocalTime> transit_schedule = new ArrayList<>();
@@ -72,7 +72,6 @@ public class map_controller {
     private void onRoadRestrictionChange(){
         String chosen_street = choiceBox_street.getValue();
         String chosen_level = choiceBox_level.getValue();
-        System.out.println("does nothing " + chosen_street +" + "+ chosen_level);
         for(Street street : streets_list){
             if ( chosen_street == street.getId() ){
                 if(chosen_level == "1"){
@@ -93,8 +92,6 @@ public class map_controller {
                     if(restriction_lvl_2.contains(street)) //check if it is not already in different list if so delete
                         restriction_lvl_2.remove(street);
                 }
-                //System.out.println("LVL1 "+ restriction_lvl_1);
-                //System.out.println("LVL2 "+ restriction_lvl_2);
             }
         }
 
@@ -106,7 +103,7 @@ public class map_controller {
      */
     @FXML
     private void onZoom(ScrollEvent event_zoom){
-       // System.out.println("controller linked");
+
         event_zoom.consume();
         double zoom = event_zoom.getDeltaY() > 0 ? 1.1 : 0.9;// increased and decreased by a constant value
         // zoom or unzoom by 10% thus 1.1 and 0.9
@@ -147,6 +144,11 @@ public class map_controller {
      */
     @FXML
     private void OnCloseStreet(ActionEvent event) throws IOException, ParseException {
+
+        if(Main.alt_road_list.size() > 0){//important for defining more alternative routes
+            Main.alt_road_list.removeAll(Main.alt_road_list);//make size of list 0 can not null
+        }
+
         ClosedStreet = closeStreet.getValue();
         main.ShowNewStage(ClosedStreet, streets_list);
 
@@ -160,6 +162,7 @@ public class map_controller {
      * @param elements_vehicles List of Drawable objects containing buses and their names
      * @param array_buslines_numbers List of Strings that contains all possible bus line numbers
      * @param array_buslines_leave_times List of LocalTimes that contains all the departure times of all buses in simulation
+     * @param arraystreet List of street on the map
      */
     public void setElements(List<Draw> elements_roads, List<Draw> elements_stops, List<Draw> elements_vehicles,
                             List<String> array_buslines_numbers, List<LocalTime> array_buslines_leave_times, List<Street> arraystreet) {
@@ -180,7 +183,7 @@ public class map_controller {
             map_box.getChildren().addAll(draw.getGUI());//paints all the elements onto the scene
         }
 
-        Coordinate temp = new Coordinate(0,0);//initialize list of current coordintaes so method set can be used in getLineInfo
+        Coordinate temp = new Coordinate(0,0);//initialize list of current coordinates so method set can be used in getLineInfo
 
         for (Draw draw : elements_vehicles) { //Draw draw = elements[i];
             map_box.getChildren().addAll(draw.getGUI());//paints all the elements onto the scene
@@ -204,8 +207,6 @@ public class map_controller {
                 if(frameCount == Math.round(scale*60) ) {
                     time = time.plusSeconds(1) ;
                     for (int index=0; index < updates.size(); index++) {
-                        //System.out.println(Main.alt_road_list);
-
                         Coordinate bus_pos_temp = updates.get(index).update(time, restriction_lvl_1, restriction_lvl_2, ClosedStreet, Main.alt_road_list);
                         buses_current_positions.set(index, bus_pos_temp);
                         map_box.layout();
@@ -279,16 +280,16 @@ public class map_controller {
             stops_index_at.add(temp_path.size() - 1);//add last stop index
 
             int index_of_closest = createTransitSchedule(transit_schedule, temp_path, index_clicked_busline,
-                                                         current_bus_position,stops_index_at);
+                    current_bus_position,stops_index_at);
             String name_of_chosen_busline = array_buslines_numbers.get(index_clicked_busline);
             displayTransitSchedule(transit_schedule, stops_names, index_of_closest, name_of_chosen_busline);
         }
-        else {//repaint Yellow lines of chosen busline back to black and aqua
+        else {//repaint Yellow lines of chosen bus line back to black and aqua
             display.getChildren().clear();//clean the transit schedule view
             bus_line_already_chosen = false;
             map_box.getChildren().clear();
             for (Draw draw : elements_roads) { //Draw draw = elements[i];
-               map_box.getChildren().addAll(draw.getGUI());//paints all the elements onto the scene
+                map_box.getChildren().addAll(draw.getGUI());//paints all the elements onto the scene
             }
             for (Draw draw : elements_stops) { //Draw draw = elements[i];
                 map_box.getChildren().addAll(draw.getGUI());//paints all the elements onto the scene
@@ -314,12 +315,12 @@ public class map_controller {
                 current_bus_position.setX(buses_current_positions.get(index).getX());
                 current_bus_position.setY(buses_current_positions.get(index).getY());
             } catch (NullPointerException e) { // coordinates are null until on the road
-                //System.out.println("Bus has not left the station yet.");
+
                 continue;
             }
             //distance between center of bus symbol and click coordinates
             double distance = Math.sqrt(Math.pow(clickedX - current_bus_position.getX(), 2)
-                            + Math.pow(clickedY - current_bus_position.getY(), 2));
+                    + Math.pow(clickedY - current_bus_position.getY(), 2));
             if (distance <= 9) {//constant value 9 was estimated to produce best results, simulates radius of bus symbol
                 return index;
             }
@@ -395,7 +396,7 @@ public class map_controller {
      */
     private void displayTransitSchedule(List <LocalTime> transit_schedule, List<String> stops_names, int index_of_closest, String name_of_chosen_busline){
         String temp ="\t  Transit Schedule\n"+
-                     "\t\tLine \""+name_of_chosen_busline+"\"\n\n";
+                "\t\tLine \""+name_of_chosen_busline+"\"\n\n";
         for (int i=0; i < transit_schedule.size();i++) {
             temp += "\t"+stops_names.get(i) + "\t : \t" + transit_schedule.get(i) + "\n";
         }
@@ -426,3 +427,5 @@ public class map_controller {
         choiceBox_level.setValue("0");
     }
 }
+
+

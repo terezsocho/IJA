@@ -1,23 +1,18 @@
 package Controllers;
 import Interfaces.Draw;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
-
 import javafx.stage.Stage;
-import sources.Main;
-import sources.Stop;
-import sources.Street;
-
+import Sources.Main;
+import Sources.Stop;
+import Sources.Street;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,12 +31,16 @@ public class AltController{
     @FXML
     public Button closeButton;
 
+    /**
+     * Method that closes window for choosing alternative route after clicking close button
+     * and fill the list with stops on alternative route
+     */
     @FXML
-    public void handleCloseButtonAction(ActionEvent event) {
-
-        Stage stage = (Stage) closeButton.getScene().getWindow();
+    public void handleCloseButtonAction() {
+        Main.alt_road_list = null;
+        Stage stage = (Stage) closeButton.getScene().getWindow();//chooses second stage
         Main.alt_road_list = alt_road_list;
-        stage.close();
+        stage.close();//closes second window
     }
 
     /**
@@ -75,37 +74,40 @@ public class AltController{
         streets_list = alt_streets_list;
         stops_list = alt_stop_list;
 
-        for(Street street : streets_list){
-            if (street_name == street.getId()){
+        for(Street street : streets_list){//looping over list of all street
+            if (street_name == street.getId()){//if names (name) coincides street is marked
                 Line red_line = new Line(street.get_Start_coord().getX(), street.get_Start_coord().getY(),
                         street.get_End_coord().getX(), street.get_End_coord().getY());
                 red_line.setStroke(Color.GREY);
                 red_line.setStrokeWidth(5.0);//set it thicker than before
-                alt_box.getChildren().add(red_line);//add it to scene over previously set values
+                alt_box.getChildren().add(red_line);//add it to scene
             }
         }
     }
 
+    /**
+     * Method processes click mouse event. If stop was clicked it is added to list of alternative route.
+     * To make it more visually friendly clicked stops changes the color.
+     * @param event when mouse is clicked
+     */
     @FXML
     private void handleOnMouseClicked(MouseEvent event)
     {
         event.consume();
-        System.out.println("Clicked! " + event.getTarget());
 
-        if (event.getTarget() instanceof Text) {
-            System.out.println("Clicked! " + event.getTarget());
-            String alt_stop =((Text) event.getTarget()).getText();
-            System.out.println("text is " + ((Text) event.getTarget()).getText());
-            for(Stop stop : stops_list){
+        if (event.getTarget() instanceof Text) {//if it is stop
 
-                if (alt_stop == stop.getId()) {
-                    if(alt_road_list.contains(stop)){
+            String alt_stop =((Text) event.getTarget()).getText();//get id of a stop
+            for(Stop stop : stops_list){//looping over all stops
+
+                if (alt_stop == stop.getId()) {// if names of stops are the same (undo)
+                    if(alt_road_list.contains(stop)){//if stops is already in list remove it
                         alt_box.getChildren().add(new Circle(stop.getCoordinates().getX(), stop.getCoordinates().getY(), 15, Color.CYAN));
                         alt_box.getChildren().add(new Text(stop.getCoordinates().getX() - 7.5, stop.getCoordinates().getY() + 5, alt_stop)); //constants just for visual fixes
                         alt_road_list.remove(stop);
 
                     }
-                    else {
+                    else {// if it is not in the list add it and change color
                         alt_box.getChildren().add(new Circle(stop.getCoordinates().getX(), stop.getCoordinates().getY(), 15, Color.PINK));
                         alt_box.getChildren().add(new Text(stop.getCoordinates().getX() - 7.5, stop.getCoordinates().getY() + 5, alt_stop)); //constants just for visual fixes
                         alt_road_list.add(stop);

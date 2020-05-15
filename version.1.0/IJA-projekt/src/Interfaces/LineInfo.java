@@ -1,12 +1,11 @@
 package Interfaces;
-import javafx.scene.shape.Shape;
-import sources.Coordinate;
-import sources.Stop;
+import Sources.Coordinate;
+import Sources.Stop;
 
 import java.util.List;
 
 
 public interface LineInfo {
-    List<sources.Coordinate> getLinePath();
+    List<Coordinate> getLinePath();
     List<Stop> getLinePathStops();
 }
