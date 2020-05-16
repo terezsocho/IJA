@@ -1,3 +1,7 @@
+/*
+ * Authors: Terézia Sochova(xsocho14), Adrián Piaček(xpiace00)
+ * Source code Street.java contains minitialization of streets used in simulation.
+ */
 package Sources;
 
 import Interfaces.Draw;

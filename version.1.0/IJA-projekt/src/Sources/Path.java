@@ -1,3 +1,8 @@
+/*
+ * Authors: Terézia Sochova(xsocho14), Adrián Piaček(xpiace00)
+ * Source code Path.java contains methods used for calculations of path each bus on a busline needs to take coupled with
+ * calculation for bus current position.
+ */
 package Sources;
 
 import java.util.List;

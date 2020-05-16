@@ -1,3 +1,8 @@
+/*
+ * Authors: Terézia Sochova(xsocho14), Adrián Piaček(xpiace00)
+ * Source code Controllers.java contains initialization of initial canvas and transit schedule. Also encapsules
+ * street restriction policies and other user interactions.
+ */
 package Controllers;
 
 import Interfaces.Draw;

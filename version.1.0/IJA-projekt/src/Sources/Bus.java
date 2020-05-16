@@ -1,3 +1,8 @@
+/*
+ * Authors: Terézia Sochova(xsocho14), Adrián Piaček(xpiace00)
+ * Source code Bus.java contains methods used for calculations of specific buses. These include their speed, routes and
+ * all the additional important measurements.
+ */
 package Sources;
 
 import Interfaces.Draw;

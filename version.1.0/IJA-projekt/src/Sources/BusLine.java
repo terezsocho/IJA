@@ -1,3 +1,8 @@
+/*
+ * Authors: Terézia Sochova(xsocho14), Adrián Piaček(xpiace00)
+ * Source code BusLine.java contains methods used for calculation of coordinates from path of a bus
+ */
+
 package Sources;
 
 import java.util.ArrayList;

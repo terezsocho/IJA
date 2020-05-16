@@ -1,3 +1,8 @@
+/*
+ * Authors: Terézia Sochova(xsocho14), Adrián Piaček(xpiace00)
+ * Source code AltController.java contains methods used for handling of user input concerning bus closure and its
+ * subsequent consequences, such as new canvas for bus detour.
+ */
 package Controllers;
 import Interfaces.Draw;
 

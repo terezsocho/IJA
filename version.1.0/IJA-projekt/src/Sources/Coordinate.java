@@ -1,3 +1,7 @@
+/*
+ * Authors: Terézia Sochova(xsocho14), Adrián Piaček(xpiace00)
+ * Source code Coordinate.java contains methods used for determination of coordinate from x and y points on a canvas.
+ */
 package Sources;
 
 import java.util.Objects;

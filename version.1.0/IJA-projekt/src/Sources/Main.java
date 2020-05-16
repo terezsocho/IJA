@@ -1,3 +1,7 @@
+/*
+ * Authors: Terézia Sochova(xsocho14), Adrián Piaček(xpiace00)
+ * Source code Main.java contains initialization of map as well as methods used for data parsing.
+ */
 package Sources;
 
 import Controllers.MainController;

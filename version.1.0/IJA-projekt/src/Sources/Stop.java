@@ -1,3 +1,7 @@
+/*
+ * Authors: Terézia Sochova(xsocho14), Adrián Piaček(xpiace00)
+ * Source code Stop.java contains initialization of stops used in simulation.
+ */
 package Sources;
 
 import Interfaces.Draw;
