@@ -18,7 +18,7 @@
       </ScrollPane>
    </center>
    <left>
-      <SplitPane dividerPositions="0.388021931674399" orientation="VERTICAL" prefHeight="950.0" prefWidth="317.0" BorderPane.alignment="CENTER">
+      <SplitPane dividerPositions="0.39856600590468155" orientation="VERTICAL" prefHeight="950.0" prefWidth="317.0" BorderPane.alignment="CENTER">
         <items>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="419.0" prefWidth="316.0">
                <children>

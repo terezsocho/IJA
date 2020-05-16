@@ -33,7 +33,6 @@ public class MainController {
     private Pane map_box = null;
     @FXML
     private Pane display = null;
-
     @FXML
     private TextField input_text_field;
     @FXML
@@ -153,6 +152,7 @@ public class MainController {
         main.ShowNewStage(ClosedStreet, streets_list);
 
     }
+
 
     /**
      * Method sets and imports all the important variables as well as draws initial City Map. Buses are not visible until
