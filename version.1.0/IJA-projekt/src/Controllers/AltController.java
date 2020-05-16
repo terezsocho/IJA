@@ -83,7 +83,7 @@ public class AltController{
             if (street_name == street.getId()){//if names (name) coincides street is marked
                 Line red_line = new Line(street.get_Start_coord().getX(), street.get_Start_coord().getY(),
                         street.get_End_coord().getX(), street.get_End_coord().getY());
-                red_line.setStroke(Color.GREY);
+                red_line.setStroke(Color.RED);
                 red_line.setStrokeWidth(5.0);//set it thicker than before
                 alt_box.getChildren().add(red_line);//add it to scene
             }
@@ -113,7 +113,7 @@ public class AltController{
 
                     }
                     else {// if it is not in the list add it and change color
-                        alt_box.getChildren().add(new Circle(stop.getCoordinates().getX(), stop.getCoordinates().getY(), 15, Color.PINK));
+                        alt_box.getChildren().add(new Circle(stop.getCoordinates().getX(), stop.getCoordinates().getY(), 15, Color.GREENYELLOW));
                         alt_box.getChildren().add(new Text(stop.getCoordinates().getX() - 7.5, stop.getCoordinates().getY() + 5, alt_stop)); //constants just for visual fixes
                         alt_road_list.add(stop);
                     }
