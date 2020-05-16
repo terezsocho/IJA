@@ -1,1 +1,56 @@
+<project name="IJA 2020" default="compile" basedir=".">
 
+	<property name="build" location="build"/>
+	<property name="data" location="data"/>
+	<property name="dest" location="dest"/>
+	<property name="doc" location="doc"/>
+	<property name="lib" location="lib"/>
+	<property name="src" location="src"/>
+
+
+	<target name="clean">
+		<delete dir="${build}"/>
+		<delete dir="${dest}"/>
+	</target>
+
+	<target name="compile" depends="clean"
+		description="Compile">
+		<mkdir dir="${build}"/>
+		<javac srcdir="${src}"
+			destdir="${build}"
+			includes="Sources/Main.java"
+			classpath="${lib}/json-simple-1.1.jar:${src}"/>
+		<copy file="${src}/Sources/alternative_road.fxml" todir="${build}/Sources"/>
+		<copy file="${src}/Sources/public_transit.fxml" todir="${build}/Sources"/>
+		
+		<mkdir dir="${dest}"/>
+		<jar destfile="${dest}/ija-projekt-2020.jar" basedir="${build}">
+			<manifest>
+				<attribute name="Main-Class" value="Sources.Main"/>
+				<attribute name="Class-Path" value="lib/json-simple-1.1.jar"/>
+			</manifest>
+
+		</jar>
+		<javadoc access="public" destdir="doc" author="true" version="true" use="true"
+		           windowtitle="IJA-Documentation ">   
+        		<fileset dir="src" defaultexcludes="yes">
+            			<include name="**/*.java"/>
+       			</fileset>
+			<classpath>
+				<fileset dir="${lib}">
+					<include name="json-simple-1.1.jar"/>
+				</fileset>
+			</classpath>
+
+    		</javadoc>
+		<mkdir dir="${dest}/lib"/>
+		<mkdir dir="${dest}/data"/>
+		<copy file="${lib}/json-simple-1.1.jar" todir="${dest}/lib"/>
+		<copy file="${data}/data.json" todir="${dest}/data"/>
+	</target>
+
+
+	<target name="run">
+		<java jar="${dest}/ija-projekt-2020.jar" dir="${dest}" fork="true" />
+	</target>
+</project>

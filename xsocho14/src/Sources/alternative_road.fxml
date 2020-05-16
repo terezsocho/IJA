@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane maxHeight="-Infinity" prefHeight="900.0" prefWidth="1050.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.AltController">
+   <bottom>
+      <Button fx:id="closeButton" mnemonicParsing="false" onAction="#handleCloseButtonAction" text="Save Changes" textAlignment="CENTER" BorderPane.alignment="CENTER">
+         <BorderPane.margin>
+            <Insets bottom="10.0" top="10.0" />
+         </BorderPane.margin>
+      </Button>
+   </bottom>
+   <center>
+      <Pane fx:id="alt_box" maxHeight="-Infinity" onMouseClicked="#handleOnMouseClicked" prefWidth="1050.0" BorderPane.alignment="CENTER">
+         <children>
+            <Text layoutX="403.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="CHOOSE ALTERNATIVE ROAD">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Text>
+            <Separator layoutX="-1.0" layoutY="29.0" prefHeight="3.0" prefWidth="1050.0" />
+         </children></Pane>
+   </center>
+</BorderPane>

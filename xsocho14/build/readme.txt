@@ -1,1 +1,0 @@
-prelozene class subory
