@@ -1,3 +1,7 @@
+/*
+ * Authors: Terézia Sochova(xsocho14), Adrián Piaček(xpiace00)
+ * Source code TimeUpdate.java contains method declarations used for updating of bus position.
+ */
 package Interfaces;
 import Sources.Coordinate;
 import Sources.Stop;
