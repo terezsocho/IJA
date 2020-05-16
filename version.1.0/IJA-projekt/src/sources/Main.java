@@ -49,7 +49,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         this.primaryStage = primaryStage;
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("../Resources/public_transit.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("public_transit.fxml"));
         Parent root = loader.load();// the root of the scene shown in the main window
         primaryStage.setTitle("Application of public transport");
         primaryStage.setScene(new Scene(root, 1350, 860));// add scene to the stage
@@ -74,10 +74,11 @@ public class Main extends Application {
      * Method generate new stage for choosing alternative road when street is closed.
      * @param closed_street Name of street that is closed (grey on map)
      * @param street_list List of all streets
+     * @throws IOException input or output expection
      */
     public static void ShowNewStage(String closed_street, List<Street> street_list) throws IOException, ParseException {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(Main.class.getResource("../Resources/alternative_road.fxml"));//load from fxml file
+        loader.setLocation(Main.class.getResource("alternative_road.fxml"));//load from fxml file
         BorderPane closeStreet = loader.load();
 
         Stage addAlternativeStage = new Stage();//new window

@@ -42,6 +42,8 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
      * @param path List of Coordinates for specific busline that each bus on thta bus line must pass
      * @param least_At List of LocalTimes that showcase departure times of all buses on busline from their first stop
      * @param bus_line_stops List of Stops on a bus route
+     * @param bus_line_streets List of Streets on a bus route
+     *@param speed speed of a bus 
      */
     public Bus(String id,  Path path, LocalTime least_At, List<Stop> bus_line_stops,List<Street> bus_line_streets, double speed) {
         this.line_coordinates = path.getPathCoord();

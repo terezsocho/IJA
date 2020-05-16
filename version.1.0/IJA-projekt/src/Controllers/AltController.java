@@ -67,7 +67,7 @@ public class AltController{
      * Method sets and imports streets and stops to the alternative stage
      * @param street_name Name of street that is closed
      * @param alt_streets_list List of streets that are part of map
-     * @param alt_stop_list
+     * @param alt_stop_list List of stop that are part of alternative route
      */
     public void MarkClosedStreet(String street_name, List<Street> alt_streets_list, List<Stop> alt_stop_list){
 
