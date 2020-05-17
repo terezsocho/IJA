@@ -236,7 +236,6 @@ public class MainController {
             public void handle(long l) {
                 if(frameCount == Math.round(scale*60) ) {
                     time = time.plusSeconds(1) ;
-                    System.out.println(time);
                     Time_Display.setText(time.toString()); //display time on label
                     for (int index=0; index < updates.size(); index++) {
                         Coordinate bus_pos_temp = updates.get(index)
@@ -244,9 +243,8 @@ public class MainController {
                                                             Main.alt_road_list, time_changed);
                         buses_current_positions.set(index, bus_pos_temp);
                         map_box.layout();
-                        //time_changed = false;
                     }
-                    time_changed.setFalse();
+                    if (time_changed.getValue())    time_changed.setFalse(); // set false after all buses are set to default
                     frameCount = 0;
                 }
                 frameCount++;
