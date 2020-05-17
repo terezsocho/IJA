@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 
 public class Bus implements Draw, TimeUpdate, LineInfo {
 
+    public static int NORMAL_BUS_SPEED = 55;
+
     private Coordinate position;
     private double distance = 0.0;
     private double speed;
@@ -39,7 +41,7 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
     private List<Double> start_restricted_streets_lvl_1 = new ArrayList<>(); // contains starting positions of restricting roads
     private List<Double> lengths_of_restricted_streets_lvl_2 = new ArrayList<>(); // contains lengths of restricted road
     private List<Double> start_restricted_streets_lvl_2 = new ArrayList<>(); // contains starting positions of restricting roads
-
+    private LocalTime last_stop = null;
 
     /**
      * Constructor for Bus object.
@@ -61,11 +63,35 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
         this.speed = speed / 3.6;//convert speed to metres per sec
         gui.add(new Circle(path.getPathCoord().get(0).getX(), path.getPathCoord().get(0).getY(), 12, Color.RED));
         gui.add(new Text(path.getPathCoord().get(0).getX() - 3.5, path.getPathCoord().get(0).getY() + 4, id));//constants just for visual fixes
-
+        last_stop = last_stop();
 
     }
 
+    public LocalTime last_stop(){
+        LocalTime next_stop_time = leaves_At;//get departure value of clicked bus
+        double delay_in_seconds = 0.0;
 
+        for(int j = 1, k = 1; j < line_coordinates.size(); j++){//loop through path of busline
+            Coordinate temp1 = line_coordinates.get(j-1);
+            Coordinate temp2 = line_coordinates.get(j);
+            if(  line_coordinates.get(j).equals(bus_line_stops.get(k).getCoordinates())){//if index is equal to index of a stop proceed
+                delay_in_seconds += getDelayAtNextStop(temp1,temp2) + 0.5;//round double up
+                next_stop_time = next_stop_time.plusSeconds((long)delay_in_seconds);
+                delay_in_seconds = 0.0;
+                k++;
+            }
+            else{//if path is not ending in bus stop just add length to overall distance between two stops
+                delay_in_seconds += getDelayAtNextStop(temp1,temp2);
+            }
+        }
+        return next_stop_time;
+    }
+
+    private double getDelayAtNextStop(Coordinate a, Coordinate b){
+        double distance = Math.sqrt(Math.pow(a.getX() - b.getX(),2) + Math.pow(a.getY() - b.getY(),2));
+        double seconds_to_travel = distance / (NORMAL_BUS_SPEED/3.6); // constant 55 is speed of vehicles - rework to get it from Bus.class
+        return seconds_to_travel;
+    }
     /**
      * Method returns identification information of a bus line
      * @return String containing a name of bus line
@@ -347,7 +373,7 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
             return coords;
         }
 
-        if (time.isAfter(leaves_At)) {// if bus started its route
+        if (time.isAfter(leaves_At) && time.isBefore(last_stop)) {// if bus started its route
              distance = getNewPosition(distance);
             if (distance > path.getPathSize()) {
                 // only moves it to final destination once, if repeated moveGUi still moves it by small margin
