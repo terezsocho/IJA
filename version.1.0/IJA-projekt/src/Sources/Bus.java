@@ -31,7 +31,7 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
     private List<Stop> alt_stops_list = new ArrayList<>();
     private List<Street> bus_line_streets; //does not need to ne initialized, constructor does that
     private List<Street> alternative_bus_line  = new ArrayList<>();
-    private LocalTime least_At;
+    private LocalTime leaves_At;
     private List<Street> restriction_lvl_1 = new ArrayList<>();
     private List<Street> restriction_lvl_2 = new ArrayList<>();
     private String closedStreet;
@@ -45,19 +45,19 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
      * Constructor for Bus object.
      * @param id identification String of a busLine
      * @param path List of Coordinates for specific busline that each bus on thta bus line must pass
-     * @param least_At List of LocalTimes that showcase departure times of all buses on busline from their first stop
+     * @param leaves_At List of LocalTimes that showcase departure times of all buses on busline from their first stop
      * @param bus_line_stops List of Stops on a bus route
      * @param bus_line_streets List of Streets on a bus route
      *@param speed speed of a bus 
      */
-    public Bus(String id,  Path path, LocalTime least_At, List<Stop> bus_line_stops,List<Street> bus_line_streets, double speed) {
+    public Bus(String id,  Path path, LocalTime leaves_At, List<Stop> bus_line_stops,List<Street> bus_line_streets, double speed) {
         this.line_coordinates = path.getPathCoord();
         this.position = path.getPathCoord().get(0);
         this.bus_line_stops = bus_line_stops;
         this.bus_line_streets = bus_line_streets;
         this.path = path;
         this.id = id;
-        this.least_At = least_At;
+        this.leaves_At = leaves_At;
         this.speed = speed / 3.6;//convert speed to metres per sec
         gui.add(new Circle(path.getPathCoord().get(0).getX(), path.getPathCoord().get(0).getY(), 12, Color.RED));
         gui.add(new Text(path.getPathCoord().get(0).getX() - 3.5, path.getPathCoord().get(0).getY() + 4, id));//constants just for visual fixes
@@ -101,6 +101,14 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
                 shape.setVisible(true);
             }
 
+            if (this.time_changed){ // if time was changed set all default value back to default
+                this.position = coordinate;
+                shape.setTranslateX(0.0);
+                shape.setTranslateY(0.0);
+                index = 0;
+                distance = 0.0;
+            }
+
             if (waiting_at_bus_stop == false) { // if bus is currently not at bus stop continue
                 //distance needs to be less than the speed that bus makes in 1 step..
                 double distance_to_next_postition = getDistance(position, line_coordinates.get(index));
@@ -108,7 +116,7 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
                 if (distance_to_next_postition < speed && behind_bus_stop == false) {
                     shape.setTranslateX((line_coordinates.get(index).getX() - position.getX()) + shape.getTranslateX());
                     shape.setTranslateY((line_coordinates.get(index).getY() - position.getY()) + shape.getTranslateY());
-                    //shape.toFront();
+
                     text_and_bus_passed++;
                     if (text_and_bus_passed % 2 == 0) {//there are 2 elements in gui, text and circle.. both need to go together
                         behind_bus_stop = true;//set true so next calculation is not according to old bus stop
@@ -275,6 +283,7 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
     }
 
     boolean set_immutable_bus_stop = true;
+    boolean time_changed;
     /**
      * Method updates positions of a bus on a canvas to its next position and check if any street was closed
      * @param time LocalTime variable used to determine if bus is up for departure
@@ -285,7 +294,9 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
      * @return Coordinate of current bus position.
      */
     @Override
-    public Coordinate update(LocalTime time, List<Street> restriction_lvl_1, List<Street> restriction_lvl_2, String closedStreet, List<Stop> alt_stops_list) {
+    public Coordinate update(LocalTime time, List<Street> restriction_lvl_1, List<Street> restriction_lvl_2,
+                             String closedStreet, List<Stop> alt_stops_list, TimeChange time_changed ) {
+
         this.restriction_lvl_1 = restriction_lvl_1;
         this.restriction_lvl_2 = restriction_lvl_2;
         this.alt_stops_list = alt_stops_list;
@@ -295,7 +306,7 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
         //if any street was closed and alternative route was set
         if((this.closedStreet != null) && (this.alt_stops_list.size() > 0)){
             //check direction of a bus
-            //this.alt_stops_list = CheckDirection(this.alt_stops_list, this.closedStreet);
+            this.alt_stops_list = CheckDirection(this.alt_stops_list, this.closedStreet);
             List<Coordinate> alt_coor_list = null;
             alt_coor_list = Alternative_road(this.alt_stops_list);//returns real path of alternative route
 
@@ -327,13 +338,20 @@ public class Bus implements Draw, TimeUpdate, LineInfo {
                 }
             }
         }
-        
-        if (time.isAfter(least_At)) {// if bus started its route
+
+        this.time_changed = time_changed.getValue();
+        if (this.time_changed){
+            Coordinate coords = path.getPathCoord().get(0);
+            moveGUI(coords);
+            removeGUI();
+            return coords;
+        }
+
+        if (time.isAfter(leaves_At)) {// if bus started its route
              distance = getNewPosition(distance);
             if (distance > path.getPathSize()) {
                 // only moves it to final destination once, if repeated moveGUi still moves it by small margin
                 if (set_immutable_bus_stop == true) {
-                    //System.out.println(path.getPathSize());
                     Coordinate coords = path.getCoorBus(path.getPathSize());
                     moveGUI(coords);
                     removeGUI();

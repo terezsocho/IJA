@@ -9,6 +9,7 @@ import Interfaces.Draw;
 import Interfaces.LineInfo;
 import Interfaces.TimeUpdate;
 import Sources.Coordinate;
+import Sources.TimeChange;
 import Sources.Main;
 import Sources.Stop;
 import Sources.Street;
@@ -18,6 +19,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
@@ -28,6 +30,7 @@ import javafx.scene.text.Text;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
+import java.time.DateTimeException;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +43,10 @@ public class MainController {
     private Pane display = null;
     @FXML
     private TextField input_text_field;
+    @FXML
+    private TextField set_time_input;
+    @FXML
+    private Label Time_Display;
     @FXML
     private ChoiceBox<String> choiceBox_street = new ChoiceBox<>();
     @FXML
@@ -66,8 +73,28 @@ public class MainController {
     private List<Street> restriction_lvl_2 = new ArrayList<>();
     private String ClosedStreet;
     private Main main;
+    private AnimationTimer animationTimer;
 
 
+    TimeChange time_changed = new TimeChange(false);
+
+
+    @FXML
+    private void onSimulationTimeChange(){
+        String inputed_String = set_time_input.getText();
+        if(inputed_String.matches("([0-9]{2}):([0-9]{2}):([0-9]{2})")){ //get only time format
+            int hours = Integer.parseInt(inputed_String.substring(0, 2));        // parsing of hh:mm:ss format
+            int minutes = Integer.parseInt(inputed_String.substring(3, 5));
+            int seconds = Integer.parseInt(inputed_String.substring(6, 8));
+            this.time = LocalTime.of(hours, minutes, seconds);
+            time_changed.setTrue();
+        }
+        else{//if foramt is wrong inform user
+            Alert wrong_input = new Alert(Alert.AlertType.WARNING, "Time that was inputed is invalid.\n" +
+                                                                            "Supported format: \n\n\t\t\t hh:mm:ss");
+            wrong_input.show();
+        }
+    }
 
     /**
      * Method stores values from choiceboxes to be later used in restriction policy for streets.
@@ -199,8 +226,6 @@ public class MainController {
         initChoiceBox();//populates choice boxes
     }
 
-    private AnimationTimer animationTimer;
-
     /**
      * Method creates timertask to be repeated every second to simulate movement of buses.
      * @param scale Double value used during fastening of the simulation
@@ -211,11 +236,17 @@ public class MainController {
             public void handle(long l) {
                 if(frameCount == Math.round(scale*60) ) {
                     time = time.plusSeconds(1) ;
+                    System.out.println(time);
+                    Time_Display.setText(time.toString()); //display time on label
                     for (int index=0; index < updates.size(); index++) {
-                        Coordinate bus_pos_temp = updates.get(index).update(time, restriction_lvl_1, restriction_lvl_2, ClosedStreet, Main.alt_road_list);
+                        Coordinate bus_pos_temp = updates.get(index)
+                                                    .update(time, restriction_lvl_1, restriction_lvl_2, ClosedStreet,
+                                                            Main.alt_road_list, time_changed);
                         buses_current_positions.set(index, bus_pos_temp);
                         map_box.layout();
+                        //time_changed = false;
                     }
+                    time_changed.setFalse();
                     frameCount = 0;
                 }
                 frameCount++;
@@ -293,6 +324,7 @@ public class MainController {
             display.getChildren().clear();//clean the transit schedule view
             bus_line_already_chosen = false;
             map_box.getChildren().clear();
+            map_box.getChildren().add(0, Time_Display);//add label to the canvas otherwise it would be hidden when refreshed
             for (Draw draw : elements_roads) { //Draw draw = elements[i];
                 map_box.getChildren().addAll(draw.getGUI());//paints all the elements onto the scene
             }
